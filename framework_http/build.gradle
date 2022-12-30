@@ -4,19 +4,13 @@ import com.framework.versionplugin.OkHttp
 import com.framework.versionplugin.Retrofit
 import com.framework.versionplugin.Rxjava3
 
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'maven-publish'
 }
 
-group = 'com.github.XueyiXia'
-version = '1.0'
-
-
 android {
-    namespace 'com.framework.https'
+    namespace 'com.framework.http'
     compileSdk BuildVersions.compileSdk
 
     defaultConfig {
@@ -41,21 +35,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-    }
-}
-
-
-afterEvaluate {
-    publishing {
-        publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.github.XueyiXia'
-                artifactId = 'As_RxjavaRetrofitMaster'
-                version = '1.0'
-            }
-        }
     }
 }
 

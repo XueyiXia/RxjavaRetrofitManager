@@ -16,5 +16,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "As_RxjavaRetrofitMaster"
 include ':app'
-include ':framework_https'
 includeBuild("VersionPlugin")
+include ':framework_http'
