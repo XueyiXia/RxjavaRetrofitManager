@@ -1,4 +1,4 @@
-package com.framework.https.enum
+package com.framework.http.enum
 
 /**
  * @author: xiaxueyi

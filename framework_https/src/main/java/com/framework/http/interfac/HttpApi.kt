@@ -1,4 +1,4 @@
-package com.framework.https.interfac
+package com.framework.http.interfac
 
 /**
  * @author: xiaxueyi
