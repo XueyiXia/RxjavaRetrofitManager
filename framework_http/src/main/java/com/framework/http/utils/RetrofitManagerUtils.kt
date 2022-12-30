@@ -23,7 +23,7 @@ class RetrofitManagerUtils private constructor() {
 
     companion object{
         private const val mDateFormat:String="yyyy-MM-dd HH:mm:ss";
-        val mInstance: RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
+        val mInstance : RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
             RetrofitManagerUtils()
         }
     }
@@ -43,15 +43,6 @@ class RetrofitManagerUtils private constructor() {
             .disableHtmlEscaping()
             .create();
 
-        //设置日志等级
-        val httpLoggingInterceptor : HttpLoggingInterceptor = HttpLoggingInterceptor();
-        httpLoggingInterceptor.level= HttpLoggingInterceptor.Level.BODY
-        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
 
         /**
          * Retrofit
@@ -61,7 +52,7 @@ class RetrofitManagerUtils private constructor() {
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(OkHttpClientUtils.getOkHttpClientBuild())
             .build()
     }
 
