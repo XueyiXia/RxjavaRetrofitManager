@@ -47,7 +47,7 @@ class RetrofitManagerUtils private constructor() {
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(OkHttpClientUtils.getOkHttpClientBuild())
             .build()
     }

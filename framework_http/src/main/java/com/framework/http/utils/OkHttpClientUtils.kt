@@ -20,7 +20,7 @@ object OkHttpClientUtils {
     fun getOkHttpClientBuild(): OkHttpClient {
 
         //设置日志等级
-        val httpLoggingInterceptor: HttpLoggingInterceptor = HttpLoggingInterceptor();
+        val httpLoggingInterceptor = HttpLoggingInterceptor();
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
