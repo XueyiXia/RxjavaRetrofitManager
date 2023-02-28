@@ -1,14 +1,12 @@
-package com.framework.http.utils
+package com.framework.http.retrofit_manager
 
+import com.framework.http.utils.OkHttpClientUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.util.concurrent.TimeUnit
 
 /**
  * @author: xiaxueyi
@@ -32,8 +30,6 @@ class RetrofitManagerUtils private constructor() {
 
 
     fun init(baseUrl:String){
-
-
 
         //创建json
         val gson: Gson = GsonBuilder()

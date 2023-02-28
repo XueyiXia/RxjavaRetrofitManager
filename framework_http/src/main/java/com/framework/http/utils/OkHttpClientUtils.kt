@@ -13,6 +13,10 @@ import java.util.concurrent.TimeUnit
 
 object OkHttpClientUtils {
 
+    private const val TAG="OkHttpClientUtils"
+
+    private const val mTimeOut: Long=60
+
     fun getOkHttpClientBuild(): OkHttpClient {
 
         //设置日志等级
@@ -20,9 +24,9 @@ object OkHttpClientUtils {
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(mTimeOut, TimeUnit.SECONDS)
+            .writeTimeout(mTimeOut, TimeUnit.SECONDS)
+            .connectTimeout(mTimeOut, TimeUnit.SECONDS)
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }
