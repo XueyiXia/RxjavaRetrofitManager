@@ -45,14 +45,12 @@ object ExceptionEngine {
             is JSONException,
             is ParseException,
             is MalformedJsonException -> {  //解析数据错误
-                eventException = EventException(
-                    throwable,
-                    code_error_analytic,
-                    msg_error_analytic
-                )
+                eventException = EventException(throwable, code_error_analytic, msg_error_analytic)
                 eventException
             }
-            is ConnectException, is SSLHandshakeException, is UnknownHostException -> { //连接网络错误
+            is ConnectException,
+            is SSLHandshakeException,
+            is UnknownHostException -> { //连接网络错误
                 eventException = EventException(
                     throwable,
                     code_error_connect,
