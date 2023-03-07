@@ -62,6 +62,7 @@ open class RxHttps constructor(builder: Builder) {
      * 初始化函数
      */
     init {
+        mContext=builder.mContext
         parameter = builder.parameter
         header = builder.header
         tag = builder.tag
