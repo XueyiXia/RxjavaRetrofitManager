@@ -1,9 +1,9 @@
-package com.framework.http
+package com.framework.http.http.config
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.enum.HttpMethod
-import com.framework.http.utils.RxHttps
+import com.framework.http.http.RxHttps
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -61,7 +61,7 @@ class Builder {
      * @param context Context?
      * @return Builder
      */
-    fun setContext(context: Context?):Builder {
+    fun setContext(context: Context?): Builder {
         mContext = context
         return this
     }
@@ -72,7 +72,7 @@ class Builder {
      * @param method HttpMethod
      * @return Builder
      */
-    fun setMethod(method: HttpMethod):Builder{
+    fun setMethod(method: HttpMethod): Builder {
         this.method=method;
         return this;
     }
@@ -82,7 +82,7 @@ class Builder {
      * GET 请求
      * @return Builder
      */
-    fun get():Builder{
+    fun get(): Builder {
         this.method=HttpMethod.GET
         return  this;
     }
@@ -91,7 +91,7 @@ class Builder {
      * POST请求
      * @return Builder
      */
-    fun post():Builder{
+    fun post(): Builder {
         this.method=HttpMethod.POST;
         return this
     }
@@ -164,7 +164,7 @@ class Builder {
      * @param parameter TreeMap<String, Any>
      * @return Builder
      */
-    fun setParameter(parameter: TreeMap<String, Any>):Builder{
+    fun setParameter(parameter: TreeMap<String, Any>): Builder {
         this.parameter=parameter;
         return this
     }

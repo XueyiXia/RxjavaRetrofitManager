@@ -1,6 +1,6 @@
 package com.framework.http.retrofit_manager
 
-import com.framework.http.utils.OkHttpClientUtils
+import com.framework.http.http.OkHttpClientUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit

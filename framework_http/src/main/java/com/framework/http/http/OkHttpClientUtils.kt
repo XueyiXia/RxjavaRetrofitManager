@@ -1,4 +1,4 @@
-package com.framework.http.utils
+package com.framework.http.http
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

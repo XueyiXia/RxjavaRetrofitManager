@@ -1,10 +1,11 @@
-package com.framework.http.utils
+package com.framework.http.http
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
-import com.framework.http.Builder
-import com.framework.http.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
+import com.framework.http.http.config.Builder
+import com.framework.http.http.config.RxHttpConfigure
+import com.framework.http.utils.RequestUtils
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -84,7 +85,7 @@ open class RxHttps constructor(builder: Builder) {
     private fun disposeHeader(){
         //处理header中文或者换行符出错问题
         for (key in header.keys) {
-            header[key]=RequestUtils.getHeaderValueEncoded(header[key])
+            header[key]= RequestUtils.getHeaderValueEncoded(header[key])
         }
     }
 

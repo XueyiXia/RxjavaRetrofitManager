@@ -1,10 +1,6 @@
 package com.framework.http.observable
 
-import com.framework.http.observer.BaseObserver
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.schedulers.Schedulers
+import com.framework.http.observer.HttpObserver
 
 
 /**
@@ -16,7 +12,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class BaseObservable{
 
-    private var mObserver:BaseObserver<Any> = BaseObserver<Any>()
+    private var mObserver:HttpObserver<Any> = HttpObserver<Any>()
 
     fun observe() {
 
