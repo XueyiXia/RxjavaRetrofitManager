@@ -1,5 +1,6 @@
 package com.framework.http
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.os.Handler
@@ -16,8 +17,14 @@ import java.util.concurrent.TimeUnit
 
 class RxHttpConfigure {
 
+    @SuppressLint("StaticFieldLeak")
     private object Config {
         val rxHttpConfigure = RxHttpConfigure()
+    }
+    companion object {
+        fun get(): RxHttpConfigure {
+            return Config.rxHttpConfigure
+        }
     }
 
     /*全局上下文*/
@@ -37,7 +44,7 @@ class RxHttpConfigure {
     private var handler: Handler? = null
 
     /*请求参数*/
-    var baseParameter: TreeMap<String, Any>? = null
+    private var baseParameter: TreeMap<String, Any>? = null
 
     /*header*/
     private var header: TreeMap<String, Any>? = null
@@ -72,6 +79,10 @@ class RxHttpConfigure {
     fun setBaseParameter(parameter: TreeMap<String, Any>?): RxHttpConfigure {
         baseParameter = parameter
         return this
+    }
+
+    fun getBaseParameter():TreeMap<String, Any>{
+        return baseParameter!!
     }
 
     /*基础Header*/
