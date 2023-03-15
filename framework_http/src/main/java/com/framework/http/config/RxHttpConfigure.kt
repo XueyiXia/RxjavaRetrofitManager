@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.framework.http.http.RxHttp
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -28,29 +27,43 @@ class RxHttpConfigure {
         }
     }
 
-    /*全局上下文*/
+    /**
+     * 全局上下文
+     */
     private var context: Context? = null
 
-    /*请求基础路径*/
+    /**
+     * 请求基础路径
+     */
     private var baseUrl: String? = null
 
-    /*超时时长*/
+    /**
+     * 超时时长
+     */
     private var timeout: Long = 60
 
-    /*时间单位*/
+    /**
+     * 时间单位
+     */
     private lateinit var timeUnit: TimeUnit
 
     /*Handler*/
     /*全局Handler*/
     private var handler: Handler? = null
 
-    /*请求参数*/
+    /**
+     * 请求参数
+     */
     private var baseParameter: TreeMap<String, Any>? = null
 
-    /*header*/
+    /**
+     * 请求头
+     */
     private var header: MutableMap<String, Any>? = TreeMap()
 
-    /*是否显示Log*/
+    /**
+     * 是否显示Log
+     */
     private var isShowLog: Boolean = false
 
     fun init(app: Application): RxHttpConfigure {
@@ -65,7 +78,7 @@ class RxHttpConfigure {
      * @param baseUrl String?
      * @return RxHttpConfigure
      */
-    fun baseUrl(baseUrl: String?): RxHttpConfigure {
+    fun setBaseUrl(baseUrl: String): RxHttpConfigure {
         this.baseUrl = baseUrl
         return this
     }
@@ -74,8 +87,11 @@ class RxHttpConfigure {
         return baseUrl
     }
 
+
     /**
      * 设置基础参数
+     * @param parameter TreeMap<String, Any>?
+     * @return RxHttpConfigure
      */
     fun setBaseParameter(parameter: TreeMap<String, Any>?): RxHttpConfigure {
         baseParameter = parameter
@@ -86,30 +102,57 @@ class RxHttpConfigure {
         return baseParameter
     }
 
-    /*基础Header*/
+
+    /**
+     * 基础Header
+     * @param header MutableMap<String, Any>?
+     * @return RxHttpConfigure
+     */
     fun setBaseHeader(header: MutableMap<String, Any>?): RxHttpConfigure {
         this.header = header
         return this
     }
 
-    val baseHeader: MutableMap<String, Any>
+    val getBaseHeader: MutableMap<String, Any>
         get() = if (header == null) TreeMap() else header!!
 
-    /*超时时长*/
-    fun timeout(timeout: Long): RxHttpConfigure {
+
+    /**
+     * 超时时长
+     * @param timeout Long
+     * @return RxHttpConfigure
+     */
+    fun setTimeout(timeout: Long): RxHttpConfigure {
         this.timeout = timeout
         return this
     }
 
-    /*是否显示LOG*/
+    fun getTimeout():Long{
+        return this.timeout
+    }
+
+
+    /**
+     * 是否显示LOG
+     * @param showLog Boolean
+     * @return RxHttpConfigure
+     */
     fun showLog(showLog: Boolean): RxHttpConfigure {
         isShowLog = showLog
         return this
     }
 
-    /*时间单位*/
-    fun timeUnit(timeUnit: TimeUnit): RxHttpConfigure {
+    /**
+     * 时间单位
+     * @param timeUnit TimeUnit
+     * @return RxHttpConfigure
+     */
+    fun setTimeUnit(timeUnit: TimeUnit): RxHttpConfigure {
         this.timeUnit = timeUnit
         return this
+    }
+
+    fun getTimeUnit():TimeUnit{
+        return this.timeUnit
     }
 }
