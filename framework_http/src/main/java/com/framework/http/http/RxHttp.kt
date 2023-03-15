@@ -7,11 +7,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
 import com.framework.http.enum.HttpMethod
 import com.framework.http.function.HttpResultFunction
-import com.framework.http.http.config.Builder
-import com.framework.http.http.config.RxHttpConfigure
+import com.framework.http.config.RxHttpBuilder
+import com.framework.http.config.RxHttpConfigure
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.observer.HttpObserver
-import com.framework.http.retrofit_manager.RetrofitManagerUtils
+import com.framework.http.manager.RetrofitManagerUtils
+import com.framework.http.scheduler.SchedulerUtils
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit
  * @说明:
  */
 
-open class RxHttp constructor(builder: Builder) {
+open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     private var mContext: Context? = null
 
@@ -74,47 +75,43 @@ open class RxHttp constructor(builder: Builder) {
 
     private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
 
-
-
-
-
     /**
      * 初始化函数
      */
     init {
-        mContext=builder.mContext
-        parameter = builder.parameter
-        header = builder.header
-        tag = builder.tag
-        fileMap = builder.fileMap
-        baseUrl = builder.baseUrl
-        apiUrl = builder.apiUrl
-        isJson = builder.isJson
-        bodyString = builder.bodyString
-        method = builder.method
-        timeout = builder.timeout
-        timeUnit = builder.timeUnit
-        lifecycleOwner = builder.lifecycleOwner
+        mContext=rxHttpBuilder.mContext
+        parameter = rxHttpBuilder.parameter
+        header = rxHttpBuilder.header
+        tag = rxHttpBuilder.tag
+        fileMap = rxHttpBuilder.fileMap
+        baseUrl = rxHttpBuilder.baseUrl
+        apiUrl = rxHttpBuilder.apiUrl
+        isJson = rxHttpBuilder.isJson
+        bodyString = rxHttpBuilder.bodyString
+        method = rxHttpBuilder.method
+        timeout = rxHttpBuilder.timeout
+        timeUnit = rxHttpBuilder.timeUnit
+        lifecycleOwner = rxHttpBuilder.lifecycleOwner
 
 
     }
 
     companion object {
-        fun get(): Builder {
-            return Builder()
+        fun getRxHttpBuilder(): RxHttpBuilder {
+            return RxHttpBuilder()
         }
     }
 
 
     /**
-     *
+     * 执行网络请求
      * @param simpleResponseListener SimpleResponseListener<T>?
      */
     open fun <T> execute(simpleResponseListener: SimpleResponseListener<T>?) {
-        this.mSimpleResponseListener=simpleResponseListener as SimpleResponseListener<Any>
         if (simpleResponseListener == null) {
             throw NullPointerException("SimpleResponseListener must not null!")
         } else {
+            this.mSimpleResponseListener=simpleResponseListener as SimpleResponseListener<Any>
             doRequest()
         }
     }
@@ -147,7 +144,7 @@ open class RxHttp constructor(builder: Builder) {
         httpObserver = HttpObserver(mSimpleResponseListener, lifecycleOwner)
 
         /**
-         * 构造 被观察者
+         * 被观察者和观察者订阅
          */
         apiObservable.map(object :io.reactivex.rxjava3.functions.Function<Any,Any>{
 
@@ -155,13 +152,8 @@ open class RxHttp constructor(builder: Builder) {
                 return t.toString()
             }
         }).onErrorResumeNext(HttpResultFunction<Any>())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .compose(SchedulerUtils.ioToMainScheduler())
             .subscribe(httpObserver as HttpObserver<Any>)
-
-        /**
-         * 被观察者和观察者订阅
-         */
 
     }
 

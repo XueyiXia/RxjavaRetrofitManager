@@ -1,4 +1,4 @@
-package com.framework.http.http.config
+package com.framework.http.config
 
 import android.annotation.SuppressLint
 import android.app.Application

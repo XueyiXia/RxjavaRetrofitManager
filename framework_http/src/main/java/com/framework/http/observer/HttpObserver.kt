@@ -1,6 +1,6 @@
 package com.framework.http.observer
 
-import com.framework.http.RxHttpTagManager
+import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.interfac.SimpleResponseListener
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable

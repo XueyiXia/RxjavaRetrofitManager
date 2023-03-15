@@ -1,4 +1,4 @@
-package com.framework.http
+package com.framework.http.manager
 
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
@@ -8,7 +8,7 @@ class RxHttpTagManager private constructor(){
 
 
     companion object {
-        fun getInstance()=RxHttpTagManager.holder
+        fun getInstance()= RxHttpTagManager.holder
 
         fun generateRandomTag(): String {
             return UUID.randomUUID().toString()

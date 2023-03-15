@@ -1,10 +1,7 @@
 package com.rxjava_retrofit
 
 import android.app.Application
-import com.framework.http.http.RxHttp
-import com.framework.http.http.config.Builder
-import com.framework.http.http.config.RxHttpConfigure
-import java.util.concurrent.TimeUnit
+import com.framework.http.config.RxHttpConfigure
 
 /**
  * @author: xiaxueyi
@@ -44,6 +41,7 @@ class AppLoader :Application() {
         RxHttpConfigure.get()
             .baseUrl(HttpApi.BASE_URL)
             .setBaseHeader(headerMap)
+            .showLog(true)
             .init(this)
     }
 }

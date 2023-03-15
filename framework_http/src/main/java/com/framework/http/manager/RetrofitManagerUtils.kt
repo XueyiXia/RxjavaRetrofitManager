@@ -1,4 +1,4 @@
-package com.framework.http.retrofit_manager
+package com.framework.http.manager
 
 import com.framework.http.http.OkHttpClientUtils
 import com.google.gson.Gson

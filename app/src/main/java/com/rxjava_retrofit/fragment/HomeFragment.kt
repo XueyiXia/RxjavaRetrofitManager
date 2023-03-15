@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +35,9 @@ class HomeFragment :Fragment(){
 
     private var dataList: MutableList<HomeBean.Issue.Item> = mutableListOf()
 
-    var parameter = TreeMap<String,Any>();
+    private var parameter = TreeMap<String,Any>();
+
+    private lateinit var mTitle:TextView
 
 
     private val linearLayoutManager by lazy {
@@ -48,30 +51,27 @@ class HomeFragment :Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        mTitle=mRootView?.findViewById(R.id.tv_title)!!
         mRecyclerView=mRootView?.findViewById(R.id.recycler_view)!!
         mHomeAdapter= mRootView?.let { HomePagerAdapter(it.context, dataList ) }
         mRecyclerView.adapter = mHomeAdapter
         mRecyclerView.layoutManager = linearLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
 
-
-
-        parameter["id"] = "00700.HK"
-        parameter["interval"] = "1m"
-        parameter.put("period","1D")
-
-
-        RxHttp.get()
+        parameter["num"] = "1"
+        RxHttp.getRxHttpBuilder()
             .setApiUrl(HttpApi.test)
+            .setLifecycle(this)
             .setParameter(parameter)
+            .get()
             .build()
-            .execute(object : SimpleResponseListener<HomeBean>() {
-                override fun onSucceed(bean: HomeBean, method: String) {
-                    super.onSucceed(bean, method)
-                    Log.e(TAG,"输出的数据(onSuccess)${bean}")
-                    dataList.addAll( bean.issueList[0].itemList)
-                    mHomeAdapter?.notifyItemRangeChanged(0,bean.issueList[0].itemList.size)
+            .execute(object : SimpleResponseListener<String>() {
+                override fun onSucceed(data: String, method: String) {
+                    super.onSucceed(data, method)
+                    mTitle.text=data
+                    Log.e(TAG,"输出的数据(onSuccess)${data}")
+//                    dataList.addAll( bean.issueList[0].itemList)
+//                    mHomeAdapter?.notifyItemRangeChanged(0,bean.issueList[0].itemList.size)
                 }
 
                 override fun onCompleted() {
@@ -81,7 +81,7 @@ class HomeFragment :Fragment(){
 
                 override fun onError(exception: Throwable) {
                     super.onError(exception)
-                    Log.e(TAG,"输出的数据(onError)${exception}")
+                    Log.e(TAG,"(onError)${exception}")
                 }
             })
     }

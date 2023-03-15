@@ -1,4 +1,4 @@
-package com.framework.http.http.config
+package com.framework.http.config
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit
  * @author: xiaxueyi
  * @date: 2023-03-07
  * @time: 11:04
- * @说明:
+ * @说明: 构建网络请求所需的参数
  */
 
-class Builder {
+class RxHttpBuilder {
 
     var mContext: Context? = null
 
@@ -59,7 +59,7 @@ class Builder {
      * @param context Context?
      * @return Builder
      */
-    fun setContext(context: Context): Builder {
+    fun setContext(context: Context): RxHttpBuilder {
         mContext = context
         return this
     }
@@ -73,7 +73,7 @@ class Builder {
      * @param method HttpMethod
      * @return Builder
      */
-    fun setMethod(method: HttpMethod): Builder {
+    fun setMethod(method: HttpMethod): RxHttpBuilder {
         this.method=method;
         return this;
     }
@@ -83,7 +83,7 @@ class Builder {
      * GET 请求
      * @return Builder
      */
-    fun get(): Builder {
+    fun get(): RxHttpBuilder {
         this.method=HttpMethod.GET
         return  this;
     }
@@ -92,7 +92,7 @@ class Builder {
      * POST请求
      * @return Builder
      */
-    fun post(): Builder {
+    fun post(): RxHttpBuilder {
         this.method=HttpMethod.POST;
         return this
     }
@@ -101,7 +101,7 @@ class Builder {
      * DELETE 请求
      * @return Builder
      */
-    fun delete(): Builder {
+    fun delete(): RxHttpBuilder {
         method = HttpMethod.DELETE
         return this
     }
@@ -110,7 +110,7 @@ class Builder {
      * PUT 请求
      * @return Builder
      */
-    fun put(): Builder {
+    fun put(): RxHttpBuilder {
         method = HttpMethod.PUT
         return this
     }
@@ -119,7 +119,7 @@ class Builder {
      * Head 请求
      * @return Builder
      */
-    fun head(): Builder {
+    fun head(): RxHttpBuilder {
         method = HttpMethod.HEAD
         return this
     }
@@ -129,7 +129,7 @@ class Builder {
      * @param baseUrl String?
      * @return Builder
      */
-    fun baseUrl(baseUrl: String?): Builder {
+    fun baseUrl(baseUrl: String?): RxHttpBuilder {
         this.baseUrl = baseUrl
         return this
     }
@@ -140,7 +140,7 @@ class Builder {
      * @param apiUrl String?
      * @return Builder
      */
-    fun setApiUrl(apiUrl: String?): Builder {
+    fun setApiUrl(apiUrl: String?): RxHttpBuilder {
         this.apiUrl = apiUrl
         return this
     }
@@ -150,7 +150,7 @@ class Builder {
      * @param parameter TreeMap<String, Any>?
      * @return Builder
      */
-    fun addParameter(parameter: TreeMap<String, Any>?): Builder {
+    fun addParameter(parameter: TreeMap<String, Any>?): RxHttpBuilder {
         if (this.parameter == null) {
             this.parameter = TreeMap()
         }
@@ -166,7 +166,7 @@ class Builder {
      * @param parameter TreeMap<String, Any>
      * @return Builder
      */
-    fun setParameter(parameter: TreeMap<String, Any>): Builder {
+    fun setParameter(parameter: TreeMap<String, Any>): RxHttpBuilder {
         this.parameter=parameter;
         return this
     }
@@ -177,7 +177,7 @@ class Builder {
      * @param isJson Boolean
      * @return Builder
      */
-    fun setBodyString(bodyString: String?, isJson: Boolean): Builder {
+    fun setBodyString(bodyString: String?, isJson: Boolean): RxHttpBuilder {
         this.isJson = isJson
         this.bodyString = bodyString
         return this
@@ -188,7 +188,7 @@ class Builder {
      * @param header TreeMap<String, Any>?
      * @return Builder
      */
-    fun addHeader(header: TreeMap<String, Any>?): Builder {
+    fun addHeader(header: TreeMap<String, Any>?): RxHttpBuilder {
         if (this.header == null) {
             this.header = sortedMapOf()
         }
@@ -201,7 +201,7 @@ class Builder {
      * @param header TreeMap<String, Any>?
      * @return Builder
      */
-    fun setHeader(header: MutableMap<String, Any>?): Builder {
+    fun setHeader(header: MutableMap<String, Any>?): RxHttpBuilder {
         this.header = header!!
         return this
     }
@@ -211,7 +211,7 @@ class Builder {
      * @param lifecycleOwner LifecycleOwner?
      * @return Builder
      */
-    fun setLifecycle(lifecycleOwner: LifecycleOwner?): Builder {
+    fun setLifecycle(lifecycleOwner: LifecycleOwner?): RxHttpBuilder {
         this.lifecycleOwner = lifecycleOwner
         return this
     }
@@ -221,7 +221,7 @@ class Builder {
      * @param tag String?
      * @return Builder
      */
-    fun tag(tag: String?): Builder {
+    fun tag(tag: String?): RxHttpBuilder {
         this.tag = tag
         return this
     }
@@ -231,7 +231,7 @@ class Builder {
      * @param file TreeMap<String, File>?
      * @return Builder
      */
-    fun file(file: TreeMap<String, File>?): Builder {
+    fun file(file: TreeMap<String, File>?): RxHttpBuilder {
         fileMap = file
         return this
     }
@@ -242,7 +242,7 @@ class Builder {
      * @param fileList List<File>
      * @return Builder
      */
-    fun file(key: String, fileList: List<File>): Builder {
+    fun file(key: String, fileList: List<File>): RxHttpBuilder {
         if (fileMap == null) {
             fileMap = IdentityHashMap()
         }
@@ -259,7 +259,7 @@ class Builder {
      * @param timeout Long
      * @return Builder
      */
-    fun timeout(timeout: Long): Builder {
+    fun timeout(timeout: Long): RxHttpBuilder {
         this.timeout = timeout
         return this
     }
@@ -269,7 +269,7 @@ class Builder {
      * @param timeUnit TimeUnit?
      * @return Builder
      */
-    fun timeUnit(timeUnit: TimeUnit?): Builder {
+    fun timeUnit(timeUnit: TimeUnit?): RxHttpBuilder {
         this.timeUnit = timeUnit
         return this
     }

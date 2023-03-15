@@ -5,25 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="1.0" >
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <TextView
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello World!" />
+            android:layout_height="wrap_content"
+            android:maxHeight="200dp" />
+
+    </androidx.core.widget.NestedScrollView>
 
 
-    </RelativeLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        app:layout_constraintVertical_weight="1.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nested"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
