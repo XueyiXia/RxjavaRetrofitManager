@@ -1,6 +1,7 @@
 package com.rxjava_retrofit.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.framework.http.http.RxHttp
+import com.framework.http.interfac.SimpleResponseListener
 import com.kotlin.mvp.bean.HomeBean
 import com.rxjava_retrofit.R
 import com.rxjava_retrofit.adapter.HomePagerAdapter
@@ -20,7 +23,7 @@ import com.rxjava_retrofit.adapter.HomePagerAdapter
  */
 
 class HomeFragment :Fragment(){
-
+    private val TAG="HomeFragment";
     private var mRootView: View? = null
 
     private lateinit var mRecyclerView: RecyclerView
@@ -28,6 +31,8 @@ class HomeFragment :Fragment(){
     private var mHomeAdapter: HomePagerAdapter? = null
 
     private var dataList: MutableList<HomeBean.Issue.Item> = mutableListOf()
+
+    var parameter: MutableMap<String, Any> = mutableMapOf();
 
 
     private val linearLayoutManager by lazy {
@@ -47,5 +52,29 @@ class HomeFragment :Fragment(){
         mRecyclerView.adapter = mHomeAdapter
         mRecyclerView.layoutManager = linearLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
+
+
+
+        parameter["id"] = "00700.HK"
+        parameter["interval"] = "1m"
+        parameter.put("period","1D")
+
+        RxHttp().execute(object :SimpleResponseListener<Any>(){
+
+            override fun onSucceed(data: Any, method: String) {
+                super.onSucceed(data, method)
+                Log.e(TAG,"输出的数据(onSuccess)${data}")
+            }
+
+            override fun onCompleted() {
+                super.onCompleted()
+                Log.e(TAG,"输出的数据(onCompleted)")
+            }
+
+            override fun onError(exception: Throwable) {
+                super.onError(exception)
+                Log.e(TAG,"输出的数据(onError)${exception}")
+            }
+        })
     }
 }

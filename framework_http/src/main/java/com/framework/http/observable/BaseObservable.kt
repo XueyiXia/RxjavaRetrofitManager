@@ -12,10 +12,4 @@ import com.framework.http.observer.HttpObserver
 
 class BaseObservable{
 
-    private var mObserver:HttpObserver<Any> = HttpObserver<Any>()
-
-    fun observe() {
-
-    }
-
 }

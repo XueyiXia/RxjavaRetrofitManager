@@ -3,7 +3,7 @@ package com.framework.http.http.config
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.enum.HttpMethod
-import com.framework.http.http.RxHttps
+import com.framework.http.http.RxHttp
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,43 +17,41 @@ import java.util.concurrent.TimeUnit
 
 class Builder {
 
-    private var mContext: Context? = null
+    var mContext: Context? = null
 
     /*请求方式*/
-    private var method: HttpMethod? = null
+    var method: HttpMethod? = null
 
-    /*请求参数*/
-    private var parameter: MutableMap<String, Any>? = null
+    var header: MutableMap<String, Any> = TreeMap<String,Any>()
 
-    /*header*/
-    private var header: MutableMap<String, Any>? = null
+    var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    private var lifecycleOwner: LifecycleOwner? = null
+    var lifecycleOwner: LifecycleOwner? = null
 
     /*标识请求的TAG*/
-    private var tag: String? = null
+    var tag: String? = null
 
     /*文件map*/
-    private var fileMap: MutableMap<String, File>? = null
+    var fileMap: MutableMap<String, File>? = null
 
     /*基础URL*/
-    private var baseUrl: String? = null
+    var baseUrl: String? = null
 
     /*apiUrl*/
-    private var apiUrl: String? = null
+    var apiUrl: String? = null
 
     /*String参数*/
-    private var bodyString: String? = null
+    var bodyString: String? = null
 
     /*是否强制JSON格式*/
-    private var isJson = false
+    var isJson = false
 
     /*超时时长*/
-    private var timeout: Long = 0
+    var timeout: Long = 0
 
     /*时间单位*/
-    private var timeUnit: TimeUnit? = null
+    var timeUnit: TimeUnit? = null
 
 
     /**
@@ -61,9 +59,12 @@ class Builder {
      * @param context Context?
      * @return Builder
      */
-    fun setContext(context: Context?): Builder {
+    fun setContext(context: Context): Builder {
         mContext = context
         return this
+    }
+    fun getContext(): Context {
+        return mContext!!
     }
 
 
@@ -133,6 +134,10 @@ class Builder {
         return this
     }
 
+    fun getBaseUrl():String{
+        return this.baseUrl!!
+    }
+
     /**
      * API URL
      * @param apiUrl String?
@@ -199,8 +204,8 @@ class Builder {
      * @param header TreeMap<String, Any>?
      * @return Builder
      */
-    fun setHeader(header: TreeMap<String, Any>?): Builder {
-        this.header = header
+    fun setHeader(header: MutableMap<String, Any>?): Builder {
+        this.header = header!!
         return this
     }
 
@@ -273,7 +278,7 @@ class Builder {
     }
 
 
-    fun build(): RxHttps {
-        return RxHttps(this)
+    fun build(): RxHttp {
+        return RxHttp(this)
     }
 }

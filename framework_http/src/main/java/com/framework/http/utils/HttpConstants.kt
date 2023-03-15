@@ -1,5 +1,10 @@
 package com.framework.http.utils
-
+/**
+ * @author: xiaxueyi
+ * @date: 2023-02-22
+ * @time: 14:02
+ * @说明: http 常用常量
+ */
 object HttpConstants {
     const val TIME_OUT = 60L
     const val MIME_TYPE_BINARY = "application/octet-stream"

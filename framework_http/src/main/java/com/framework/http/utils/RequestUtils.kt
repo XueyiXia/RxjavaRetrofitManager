@@ -3,9 +3,12 @@ package com.framework.http.utils
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
+
 /**
- * 请求工具类
- *
+ * @author: xiaxueyi
+ * @date: 2023-02-22
+ * @time: 14:02
+ * @说明: 请求工具类
  */
 object RequestUtils {
 

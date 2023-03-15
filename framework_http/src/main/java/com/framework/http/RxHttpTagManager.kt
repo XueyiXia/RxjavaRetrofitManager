@@ -6,11 +6,20 @@ import java.util.concurrent.ConcurrentHashMap
 
 class RxHttpTagManager private constructor(){
 
+
+    companion object {
+        fun getInstance()=RxHttpTagManager.holder
+
+        fun generateRandomTag(): String {
+            return UUID.randomUUID().toString()
+        }
+    }
+
     private object RxHttpTagManager {
         val holder = RxHttpTagManager()
     }
 
-    private val map: MutableMap<Any, Disposable> = ConcurrentHashMap(16)
+    private val map: MutableMap<Any, Disposable> = ConcurrentHashMap(32)
 
 
     /**
@@ -58,11 +67,4 @@ class RxHttpTagManager private constructor(){
         }
     }
 
-    companion object {
-        fun getInstance()=RxHttpTagManager.holder
-
-        fun generateRandomTag(): String {
-            return UUID.randomUUID().toString()
-        }
-    }
 }

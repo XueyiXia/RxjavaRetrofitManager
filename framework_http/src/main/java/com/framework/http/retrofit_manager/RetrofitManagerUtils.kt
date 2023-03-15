@@ -21,16 +21,24 @@ class RetrofitManagerUtils private constructor() {
 
     companion object{
         private const val mDateFormat:String="yyyy-MM-dd HH:mm:ss";
-        val mInstance : RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
-            RetrofitManagerUtils()
+//       private val mInstance : RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
+//            RetrofitManagerUtils()
+//        }
+
+        fun getInstance():RetrofitManagerUtils{
+            val instance : RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
+                RetrofitManagerUtils()
+            }
+            return instance
         }
     }
 
 
 
 
-    fun init(baseUrl:String){
 
+
+    fun getRetrofit(baseUrl:String):Retrofit{
         //创建json
         val gson: Gson = GsonBuilder()
             .setDateFormat(mDateFormat)
@@ -50,6 +58,8 @@ class RetrofitManagerUtils private constructor() {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(OkHttpClientUtils.getOkHttpClientBuild())
             .build()
+
+        return mRetrofit
     }
 
 
