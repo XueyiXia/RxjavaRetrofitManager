@@ -12,7 +12,7 @@ import java.security.MessageDigest
  * @time: 14:02
  * @说明:
  */
-object Md5Util {
+object Md5Utils {
 
     fun getMD5(str: String) = str.encodeUtf8().md5().hex()
 

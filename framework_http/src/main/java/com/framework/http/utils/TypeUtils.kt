@@ -8,8 +8,13 @@ import java.lang.reflect.Type
  * @time: 14:02
  * @说明:
  */
-object TypeUtil {
+object TypeUtils {
 
+    /**
+     *
+     * @param subclass Class<*>
+     * @return Type
+     */
     fun getType(subclass: Class<*>): Type {
         val superclass = subclass.genericSuperclass
         return if (superclass is Class<*>) {
@@ -18,5 +23,19 @@ object TypeUtil {
             val parameterized = superclass as ParameterizedType
             parameterized.actualTypeArguments[0]
         }
+    }
+
+
+    /**
+     * 获取泛型 Type
+     *
+     * @param subclass
+     * @param <T>
+     * @return
+    </T> */
+    fun <T> getGenericType(subclass: Class<*>): Type {
+        val types: Array<Type> = subclass.javaClass.genericInterfaces
+        val params = (types[0] as ParameterizedType).actualTypeArguments
+        return params[0]
     }
 }

@@ -16,7 +16,7 @@ import javax.net.ssl.*
  * @time: 14:02
  * @说明:
  */
-object SSLUtil {
+object SSLUtils {
 
     private val UnSafeTrustManager: X509TrustManager = object : X509TrustManager {
         @Throws(CertificateException::class)

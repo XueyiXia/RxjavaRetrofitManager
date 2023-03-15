@@ -59,35 +59,35 @@ class HomeFragment :Fragment(){
         mRecyclerView.itemAnimator = DefaultItemAnimator()
 
         parameter["num"] = "1"
-
+        initRequestHttp()
     }
 
 
     private fun initRequestHttp(){
-//        RxHttp.getRxHttpBuilder()
-//            .setApiUrl(HttpApi.test)
-//            .setLifecycle(this)
-//            .setParameter(parameter)
-//            .get()
-//            .build()
-//            .execute(object : SimpleResponseListener<String>() {
-//                override fun onSucceed(data: String, method: String) {
-//                    super.onSucceed(data, method)
-//                    mTitle.text=data
-//                    Log.e(TAG,"输出的数据(onSuccess)${data}")
-//                    dataList.addAll( bean.issueList[0].itemList)
-//                    mHomeAdapter?.notifyItemRangeChanged(0,bean.issueList[0].itemList.size)
-//                }
-//
-//                override fun onCompleted() {
-//                    super.onCompleted()
-//                    Log.e(TAG,"输出的数据(onCompleted)")
-//                }
-//
-//                override fun onError(exception: Throwable) {
-//                    super.onError(exception)
-//                    Log.e(TAG,"(onError)${exception}")
-//                }
-//            })
+        RxHttp.getRxHttpBuilder()
+            .setApiUrl(HttpApi.test)
+            .setLifecycle(this)
+            .setParameter(parameter)
+            .get()
+            .build()
+            .execute(object : SimpleResponseListener<HomeBean>() {
+                override fun onSucceed(data: HomeBean, method: String) {
+                    super.onSucceed(data, method)
+                    mTitle.text=data.toString()
+                    Log.e(TAG,"输出的数据(onSuccess)${data}")
+                    dataList.addAll( data.issueList[0].itemList)
+                    mHomeAdapter?.notifyItemRangeChanged(0,data.issueList[0].itemList.size)
+                }
+
+                override fun onCompleted() {
+                    super.onCompleted()
+                    Log.e(TAG,"输出的数据(onCompleted)")
+                }
+
+                override fun onError(exception: Throwable) {
+                    super.onError(exception)
+                    Log.e(TAG,"(onError)${exception}")
+                }
+            })
     }
 }

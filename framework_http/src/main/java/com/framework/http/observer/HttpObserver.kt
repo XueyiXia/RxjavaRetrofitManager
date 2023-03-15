@@ -2,6 +2,8 @@ package com.framework.http.observer
 
 import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.interfac.SimpleResponseListener
+import com.framework.http.utils.ParseUtils
+import com.framework.http.utils.TypeUtils
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.internal.disposables.DisposableHelper
@@ -28,7 +30,13 @@ class HttpObserver<T : Any>(private val simpleResponseListener: SimpleResponseLi
     }
 
     override fun onNext(t: T) {
-        simpleResponseListener?.onSucceed(t,tag.toString())
+        val genericType = simpleResponseListener?.let {
+            TypeUtils.getType(it.javaClass)
+        }
+        val result: T? = genericType?.let { ParseUtils.parseResponse(t.toString(), it) }
+        if (result != null) {
+            simpleResponseListener?.onSucceed(result,tag.toString())
+        }
     }
 
     override fun onError(e: Throwable) {

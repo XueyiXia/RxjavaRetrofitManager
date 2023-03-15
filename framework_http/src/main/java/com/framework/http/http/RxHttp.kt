@@ -141,7 +141,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener, lifecycleOwner)
+        httpObserver = HttpObserver(mSimpleResponseListener, tag)
 
         /**
          * 被观察者和观察者订阅
