@@ -2,6 +2,8 @@ package com.rxjava_retrofit
 
 import android.app.Application
 import com.framework.http.config.RxHttpConfigure
+import com.framework.http.utils.HttpConstants
+import java.util.concurrent.TimeUnit
 
 /**
  * @author: xiaxueyi
@@ -39,8 +41,10 @@ class AppLoader :Application() {
 
         //必须初始化
         RxHttpConfigure.get()
-            .baseUrl(HttpApi.BASE_URL)
+            .setBaseUrl(HttpApi.BASE_URL)
             .setBaseHeader(headerMap)
+            .setTimeout(HttpConstants.TIME_OUT)
+            .setTimeUnit(TimeUnit.MILLISECONDS)
             .showLog(true)
             .init(this)
     }
