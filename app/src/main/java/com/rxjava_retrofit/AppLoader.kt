@@ -3,6 +3,7 @@ package com.rxjava_retrofit
 import android.app.Application
 import com.framework.http.http.RxHttp
 import com.framework.http.http.config.Builder
+import com.framework.http.http.config.RxHttpConfigure
 import java.util.concurrent.TimeUnit
 
 /**
@@ -40,11 +41,9 @@ class AppLoader :Application() {
         headerMap["Accept"] = "Application/Json"
 
         //必须初始化
-
-        val builder: Builder=Builder()
-
-        builder.baseUrl(HttpApi.BASE_URL)                   //基础URL
-        builder.build()                    //初始化
-        RxHttp(builder)
+        RxHttpConfigure.get()
+            .baseUrl(HttpApi.BASE_URL)
+            .setBaseHeader(headerMap)
+            .init(this)
     }
 }

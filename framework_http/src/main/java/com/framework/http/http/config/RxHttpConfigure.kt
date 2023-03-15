@@ -5,7 +5,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import java.util.TreeMap
+import com.framework.http.http.RxHttp
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -47,7 +48,7 @@ class RxHttpConfigure {
     private var baseParameter: TreeMap<String, Any>? = null
 
     /*header*/
-    private var header: TreeMap<String, Any>? = null
+    private var header: MutableMap<String, Any>? = TreeMap()
 
     /*是否显示Log*/
     private var isShowLog: Boolean = false
@@ -81,12 +82,12 @@ class RxHttpConfigure {
         return this
     }
 
-    fun getBaseParameter():TreeMap<String, Any>{
-        return baseParameter!!
+    fun getBaseParameter():TreeMap<String, Any>?{
+        return baseParameter
     }
 
     /*基础Header*/
-    fun baseHeader(header: TreeMap<String, Any>?): RxHttpConfigure {
+    fun setBaseHeader(header: MutableMap<String, Any>?): RxHttpConfigure {
         this.header = header
         return this
     }

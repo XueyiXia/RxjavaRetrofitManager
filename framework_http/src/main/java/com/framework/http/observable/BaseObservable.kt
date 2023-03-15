@@ -1,7 +1,5 @@
 package com.framework.http.observable
 
-import com.framework.http.observer.HttpObserver
-
 
 /**
  * @author: xiaxueyi

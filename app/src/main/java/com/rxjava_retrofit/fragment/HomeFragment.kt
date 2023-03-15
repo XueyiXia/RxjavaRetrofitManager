@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.framework.http.http.RxHttp
 import com.framework.http.interfac.SimpleResponseListener
 import com.kotlin.mvp.bean.HomeBean
+import com.rxjava_retrofit.HttpApi
 import com.rxjava_retrofit.R
 import com.rxjava_retrofit.adapter.HomePagerAdapter
+import java.util.TreeMap
 
 /**
  * @author: xiaxueyi
@@ -32,7 +34,7 @@ class HomeFragment :Fragment(){
 
     private var dataList: MutableList<HomeBean.Issue.Item> = mutableListOf()
 
-    var parameter: MutableMap<String, Any> = mutableMapOf();
+    var parameter = TreeMap<String,Any>();
 
 
     private val linearLayoutManager by lazy {
@@ -59,22 +61,28 @@ class HomeFragment :Fragment(){
         parameter["interval"] = "1m"
         parameter.put("period","1D")
 
-        RxHttp().execute(object :SimpleResponseListener<Any>(){
 
-            override fun onSucceed(data: Any, method: String) {
-                super.onSucceed(data, method)
-                Log.e(TAG,"输出的数据(onSuccess)${data}")
-            }
+        RxHttp.get()
+            .setApiUrl(HttpApi.test)
+            .setParameter(parameter)
+            .build()
+            .execute(object : SimpleResponseListener<HomeBean>() {
+                override fun onSucceed(bean: HomeBean, method: String) {
+                    super.onSucceed(bean, method)
+                    Log.e(TAG,"输出的数据(onSuccess)${bean}")
+                    dataList.addAll( bean.issueList[0].itemList)
+                    mHomeAdapter?.notifyItemRangeChanged(0,bean.issueList[0].itemList.size)
+                }
 
-            override fun onCompleted() {
-                super.onCompleted()
-                Log.e(TAG,"输出的数据(onCompleted)")
-            }
+                override fun onCompleted() {
+                    super.onCompleted()
+                    Log.e(TAG,"输出的数据(onCompleted)")
+                }
 
-            override fun onError(exception: Throwable) {
-                super.onError(exception)
-                Log.e(TAG,"输出的数据(onError)${exception}")
-            }
-        })
+                override fun onError(exception: Throwable) {
+                    super.onError(exception)
+                    Log.e(TAG,"输出的数据(onError)${exception}")
+                }
+            })
     }
 }

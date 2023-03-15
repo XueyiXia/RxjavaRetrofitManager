@@ -134,9 +134,6 @@ class Builder {
         return this
     }
 
-    fun getBaseUrl():String{
-        return this.baseUrl!!
-    }
 
     /**
      * API URL

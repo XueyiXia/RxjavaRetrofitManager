@@ -16,11 +16,11 @@ import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -72,14 +72,17 @@ open class RxHttp constructor(builder: Builder) {
 
     private var httpObserver: HttpObserver<*>? = null
 
-    private val mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
+    private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
+
+
+
 
 
     /**
      * 初始化函数
      */
     init {
-        mContext=builder.getContext()
+        mContext=builder.mContext
         parameter = builder.parameter
         header = builder.header
         tag = builder.tag
@@ -92,6 +95,14 @@ open class RxHttp constructor(builder: Builder) {
         timeout = builder.timeout
         timeUnit = builder.timeUnit
         lifecycleOwner = builder.lifecycleOwner
+
+
+    }
+
+    companion object {
+        fun get(): Builder {
+            return Builder()
+        }
     }
 
 
@@ -100,6 +111,7 @@ open class RxHttp constructor(builder: Builder) {
      * @param simpleResponseListener SimpleResponseListener<T>?
      */
     open fun <T> execute(simpleResponseListener: SimpleResponseListener<T>?) {
+        this.mSimpleResponseListener=simpleResponseListener as SimpleResponseListener<Any>
         if (simpleResponseListener == null) {
             throw NullPointerException("SimpleResponseListener must not null!")
         } else {
@@ -172,7 +184,7 @@ open class RxHttp constructor(builder: Builder) {
             requestBody = bodyString?.toRequestBody(mediaType.toMediaType())
         }
 
-        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl!!)
+        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(getBaseUrl()!!)
         val apiService=retrofit.create(APIService::class.java)
 
         var apiObservable: Observable<JsonElement>? = null
@@ -228,12 +240,18 @@ open class RxHttp constructor(builder: Builder) {
      * 处理请求参数
      */
     private fun disposeParameter(){
-        //添加基础 Parameter
-        RxHttpConfigure.get().getBaseParameter().let {
-            if (it.isNotEmpty()) {
-                parameter.putAll(it)
+
+        try {
+            //添加基础 Parameter
+            RxHttpConfigure.get().getBaseParameter()?.let {
+                if (it.isNotEmpty()) {
+                    parameter.putAll(it)
+                }
             }
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
         }
+
     }
 
     /**
@@ -245,5 +263,16 @@ open class RxHttp constructor(builder: Builder) {
             apiUrl=""
         }
         return apiUrl as String
+    }
+
+
+    /**
+     * 获取基础URL
+     * @return String?
+     */
+    private fun getBaseUrl(): String? {
+        //如果没有重新指定URL则是用默认配置
+        return if (TextUtils.isEmpty(baseUrl)) RxHttpConfigure.get()
+            .getBaseUrl() else baseUrl
     }
 }
