@@ -1,4 +1,4 @@
-package com.kotlin.mvp.bean
+package com.rxjava_retrofit.bean
 
 import java.io.Serializable
 
@@ -56,7 +56,7 @@ data class HomeBean(val issueList: ArrayList<Issue>, val nextPageUrl: String, va
                             val lastViewTime: Any,
                             val playlists: Any,
                             val header: Header,
-                            val itemList:ArrayList<HomeBean.Issue.Item>
+                            val itemList:ArrayList<Item>
             ) : Serializable {
                 data class Tag(val id: Int, val name: String, val actionUrl: String, val adTrack: Any) : Serializable
 
@@ -79,8 +79,8 @@ data class HomeBean(val issueList: ArrayList<Issue>, val nextPageUrl: String, va
 
                 data class Url(val size: Long) : Serializable
 
-                data class Header(val id: Int,val icon: String,val iconType: String,val description: String,val title: String,val font: String,val cover: String,val label: Label,
-                                  val actionUrl: String ,val subtitle:String, val labelList: ArrayList<Label>): Serializable{
+                data class Header(val id: Int, val icon: String, val iconType: String, val description: String, val title: String, val font: String, val cover: String, val label: Label,
+                                  val actionUrl: String, val subtitle:String, val labelList: ArrayList<Label>): Serializable{
                     data class Label(val text: String,val card: String,val detial: Any,val actionUrl: Any)
                 }
 

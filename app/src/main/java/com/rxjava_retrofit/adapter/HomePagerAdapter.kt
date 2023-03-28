@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.kotlin.mvp.bean.HomeBean
+import com.rxjava_retrofit.bean.HomeBean
 import com.rxjava_retrofit.R
 
 
@@ -23,7 +23,7 @@ class HomePagerAdapter(var context : Context, private val dataList: MutableList<
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        var bean:HomeBean.Issue.Item=dataList[position]
+        var bean: HomeBean.Issue.Item=dataList[position]
         //这里给子条目控件设置图片跟文字
         val defAvatar = R.mipmap.ic_launcher
         val cover = bean.data?.cover?.feed

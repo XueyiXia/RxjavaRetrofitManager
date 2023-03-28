@@ -5,20 +5,17 @@ import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
-import com.framework.http.enum.HttpMethod
-import com.framework.http.function.HttpResultFunction
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
+import com.framework.http.enum.HttpMethod
 import com.framework.http.interfac.SimpleResponseListener
-import com.framework.http.observer.HttpObserver
 import com.framework.http.manager.RetrofitManagerUtils
-import com.framework.http.scheduler.SchedulerUtils
+import com.framework.http.observable.HttpObservable
+import com.framework.http.observer.HttpObserver
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -71,7 +68,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     /*时间单位*/
     private var timeUnit: TimeUnit? = null
 
-    private var httpObserver: HttpObserver<*>? = null
+    private var httpObserver: HttpObserver<Any>? = null
 
     private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
 
@@ -146,14 +143,21 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 被观察者和观察者订阅
          */
-        apiObservable.map(object :io.reactivex.rxjava3.functions.Function<Any,Any>{
+        val httpObservable: HttpObservable = HttpObservable(apiObservable, httpObserver)
 
-            override fun apply(t: Any): Any {
-                return t.toString()
-            }
-        }).onErrorResumeNext(HttpResultFunction<Any>())
-            .compose(SchedulerUtils.ioToMainScheduler())
-            .subscribe(httpObserver as HttpObserver<Any>)
+        /**
+         * 设置监听，被观察和观察者订阅
+         */
+        httpObservable.observe()
+
+//        apiObservable.map(object :io.reactivex.rxjava3.functions.Function<Any,Any>{
+//
+//            override fun apply(t: Any): Any {
+//                return t.toString()
+//            }
+//        }).onErrorResumeNext(HttpResultFunction<Any>())
+//            .compose(SchedulerUtils.ioToMainScheduler())
+//            .subscribe(httpObserver as HttpObserver<Any>)
 
     }
 

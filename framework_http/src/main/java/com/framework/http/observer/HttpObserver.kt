@@ -1,7 +1,7 @@
 package com.framework.http.observer
 
-import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.interfac.SimpleResponseListener
+import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.utils.ParseUtils
 import com.framework.http.utils.TypeUtils
 import io.reactivex.rxjava3.core.Observer
@@ -34,8 +34,9 @@ class HttpObserver<T : Any>(private val simpleResponseListener: SimpleResponseLi
             TypeUtils.getType(it.javaClass)
         }
         val result: T? = genericType?.let { ParseUtils.parseResponse(t.toString(), it) }
-        if (result != null) {
-            simpleResponseListener?.onSucceed(result,tag.toString())
+
+        result?.let {
+            simpleResponseListener?.onSucceed(it,tag.toString())
         }
     }
 
