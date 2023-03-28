@@ -2,6 +2,7 @@ package com.framework.http.observable
 
 import com.framework.http.function.HttpResultFunction
 import com.framework.http.function.OnDisposeAction
+import com.framework.http.function.RetryWithDelayFunction
 import com.framework.http.observer.HttpObserver
 import com.framework.http.scheduler.SchedulerUtils
 import io.reactivex.rxjava3.core.Observable
@@ -20,6 +21,11 @@ import io.reactivex.rxjava3.core.Observable
  */
 
 class HttpObservable  constructor(private val apiObservable: Observable<Any>?, private val httpObserver: HttpObserver<Any>?){
+
+    companion object{
+        var maxRetries = 5
+        var retryDelayMillis = 100L
+    }
 
 
     /**
@@ -57,7 +63,9 @@ class HttpObservable  constructor(private val apiObservable: Observable<Any>?, p
      */
     fun observe() {
         if (httpObserver != null) {
+            val retryWithDelayFunction=RetryWithDelayFunction(maxRetries,retryDelayMillis)
             doOnDispose()
+                ?.retryWhen(retryWithDelayFunction)
                 ?.compose(SchedulerUtils.ioToMainScheduler())
                 ?.subscribe(httpObserver)
         }

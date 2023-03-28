@@ -10,11 +10,11 @@ import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
-import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.observable.HttpObservable
 import com.framework.http.observer.HttpObserver
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.RequestUtils
+import com.framework.http.utils.StringUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType.Companion.toMediaType
@@ -179,7 +179,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             requestBody = bodyString?.toRequestBody(mediaType.toMediaType())
         }
 
-        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(getBaseUrl()!!)
+        val baseUrl= getBaseUrl()!!
+        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
         val apiService=retrofit.create(APIService::class.java)
 
         var apiObservable: Observable<JsonElement>? = null
@@ -265,17 +266,6 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * 获取基础URL
      * @return String?
      */
-    private fun getBaseUrl(): String? {
-        //如果没有重新指定URL则是用默认配置
-        return if (TextUtils.isEmpty(baseUrl)) RxHttpConfigure.get()
-            .getBaseUrl() else baseUrl
-    }
+    private fun getBaseUrl()=if(TextUtils.isEmpty(baseUrl)) RxHttpConfigure.get().getBaseUrl() else baseUrl
 
-    /**
-     *  取消网络请求,tag为null取消所有网络请求,tag不为null值取消指定的网络请求
-     * @param tag Any?
-     */
-    fun cancelRequest(tag: Any?) {
-        RxHttpTagManager.getInstance().cancelTag(tag)
-    }
 }
