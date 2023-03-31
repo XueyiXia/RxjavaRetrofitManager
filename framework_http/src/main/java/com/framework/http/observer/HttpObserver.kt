@@ -92,8 +92,8 @@ class HttpObserver<T : Any> constructor(
         Log.e(TAG,"source--->>: $source   event--->>: $event")
         when (event) {
             Event.ON_DESTROY -> {
-                //取消网络请求,tag为null取消所有网络请求,tag不为null值取消指定的网络请求
-                RxHttpTagManager.getInstance().cancelTag(null)
+                //取消网络请求,tag为null取消所有网络请求,tag不为null值，取消指定的网络请求
+                RxHttpTagManager.getInstance().cancelTag(tag)
             }
             else -> {
 
