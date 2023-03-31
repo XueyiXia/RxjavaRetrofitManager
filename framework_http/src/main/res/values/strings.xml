@@ -102,5 +102,7 @@
 
 
     <string name="cancel_app">再按一次退出程序</string>
-
+    <string name="download_progress">下载进度:%d%%</string>
+    <string name="download_failed">下载失败</string>
+    <string name="download_success">下载完成</string>
 </resources>

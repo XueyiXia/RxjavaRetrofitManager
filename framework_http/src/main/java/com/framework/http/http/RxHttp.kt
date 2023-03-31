@@ -360,13 +360,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      */
     @Throws(Exception::class)
     private fun getContentLength(url: String): Long {
-//        val response = ap.head(url).execute()
-//        if (response.isSuccessful) {
-//            val contentLength = response.headers()["Content-Length"]
-//            if (!TextUtils.isEmpty(contentLength)) {
-//                return contentLength!!.toLong()
-//            }
-//        }
+
         return -1
     }
 }

@@ -2,6 +2,8 @@ package com.framework.http.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.text.InputType
 import android.text.TextUtils
@@ -9,7 +11,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.content.FileProvider
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.lang.reflect.Method
@@ -158,4 +162,37 @@ object StringUtils {
         imm.hideSoftInputFromWindow(windowToken,0)
     }
 
+
+
+    /**
+     * 安装Apk
+     */
+    fun installApk(context: Context, file: File?, authority: String) {
+        if (file == null || !file.exists()) {
+            return
+        }
+        try {
+//            val pm = context.packageManager
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                if (!pm.canRequestPackageInstalls()) {
+//                    val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + context.packageName))
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                    context.startActivity(intent)
+//                    return
+//                }
+//            }
+            val intent = Intent(Intent.ACTION_VIEW)
+            val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                FileProvider.getUriForFile(context, authority, file)
+            } else {
+                Uri.fromFile(file)
+            }
+            intent.setDataAndType(uri, "application/vnd.android.package-archive")
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
