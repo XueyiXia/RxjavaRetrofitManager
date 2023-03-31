@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
+import com.framework.http.bean.DownloadInfo
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
@@ -14,9 +15,11 @@ import com.framework.http.observable.HttpObservable
 import com.framework.http.observer.HttpObserver
 import com.framework.http.upload.UploadRequestBody
 import com.framework.http.utils.HttpConstants
+import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -76,6 +79,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
 
     private var uploadResult: OnUpLoadFileListener<Any>? = null
+
+    var isBreakpoint = false //是否断点下载，true
 
     /**
      * 初始化函数
@@ -209,6 +214,52 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
          * 设置监听，被观察和观察者订阅
          */
         httpObservable.observe()
+    }
+
+
+    private fun doDownload(){
+        val file = File("")
+//        val downloadInfo = DownloadInfo(apiUrl!!, request.dir, request.filename)
+        if (!TextUtils.isEmpty(request.md5)) {
+            if (file.exists()) {
+                val fileMd5 = Md5Utils.getMD5(file)
+//                if (request.md5.equals(fileMd5, ignoreCase = true)) {
+//                    downloadInfo.total = file.length()
+//                    downloadInfo.progress = file.length()
+//                    callback.onNext(downloadInfo as T)
+//                    callback.onComplete()
+//                    return
+//                }
+            }
+        }
+
+        /**
+         * 请求方式处理（被观察）
+         */
+        val baseUrl= getBaseUrl()!!
+        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
+        val apiService=retrofit.create(APIService::class.java)
+
+        /**
+         * 构造 观察者
+         */
+        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner)
+
+        /**
+         * 被观察者和观察者订阅
+         */
+        val httpObservable = HttpObservable(apiObservable, httpObserver)
+
+        /**
+         * 设置监听，被观察和观察者订阅
+         */
+        httpObservable.observe()
+
+        if (isBreakpoint) {
+
+        } else {
+
+        }
     }
 
     /**

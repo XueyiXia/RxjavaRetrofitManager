@@ -116,6 +116,15 @@ interface APIService {
     ): Observable<JsonElement>
 
     /**
+     * 下载请求,普通下载
+     * @param url
+     * @return
+     */
+    @GET
+    @Streaming
+    fun download(@Url url: String): Observable<ResponseBody>
+
+    /**
      * 断点续传下载
      *
      * @param range  断点下载范围 bytes= start - end
@@ -126,11 +135,7 @@ interface APIService {
      */
     @Streaming
     @GET
-    fun download(
-        @Header("RANGE") range: String,
-        @Url url: String,
-        @HeaderMap header: Map<String, *>
-    ): Observable<ResponseBody>
+    fun download(@Url url: String, @HeaderMap header: MutableMap<String, Any>,@Header("RANGE") range: String): Observable<ResponseBody>
 
 
     /**

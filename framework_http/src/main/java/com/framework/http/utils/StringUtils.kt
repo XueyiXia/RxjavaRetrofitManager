@@ -195,4 +195,14 @@ object StringUtils {
             e.printStackTrace()
         }
     }
+
+
+    /**
+     * 获取下载文件的范围
+     * @param position Long
+     * @return String
+     */
+    fun getDownloadRange(position:Long):String{
+       return String.format("bytes=%d-", position)
+    }
 }
