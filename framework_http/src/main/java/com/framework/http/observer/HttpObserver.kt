@@ -55,14 +55,18 @@ class HttpObserver<T : Any> constructor(
         result?.let {
             simpleResponseListener?.onSucceed(it,tag.toString())
         }
+
+        Log.e(TAG,"onNext--->> : $t  ")
     }
 
     override fun onError(e: Throwable) {
         simpleResponseListener?.onError(e)
+        Log.e(TAG,"onError--->> : $e  ")
     }
 
     override fun onComplete() {
         simpleResponseListener?.onCompleted()
+        Log.e(TAG,"onComplete--->>: ")
     }
 
     override fun dispose() {

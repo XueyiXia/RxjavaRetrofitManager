@@ -251,7 +251,11 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             }
 
             HttpMethod.DELETE -> {
-                apiObservable = apiService.delete(disposeApiUrl(), parameter, header)
+                apiObservable = if (parameter.isNotEmpty()) {
+                    apiService.delete(disposeApiUrl(), parameter, header)
+                } else {
+                    apiService.delete(disposeApiUrl())
+                }
 
             }
 
@@ -260,7 +264,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             }
 
             HttpMethod.HEAD -> {
-//                apiObservable = apiService.head(disposeApiUrl())
+                apiObservable = apiService.head(disposeApiUrl())
+
             }
 
             else -> { //默认get 请求
@@ -346,4 +351,22 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      */
     private fun getBaseUrl()=if(TextUtils.isEmpty(baseUrl)) RxHttpConfigure.get().getBaseUrl() else baseUrl
 
+
+    /**
+     * 获取head 请求长度
+     * @param url String
+     * @return Long
+     * @throws Exception
+     */
+    @Throws(Exception::class)
+    private fun getContentLength(url: String): Long {
+//        val response = ap.head(url).execute()
+//        if (response.isSuccessful) {
+//            val contentLength = response.headers()["Content-Length"]
+//            if (!TextUtils.isEmpty(contentLength)) {
+//                return contentLength!!.toLong()
+//            }
+//        }
+        return -1
+    }
 }

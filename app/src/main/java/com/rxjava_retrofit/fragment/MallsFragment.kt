@@ -93,7 +93,7 @@ class MallsFragment :Fragment(){
             .setApiUrl(HttpApi.URL_UPLOAD_IMG)
             .setLifecycle(this)
             .file(HttpConstants.UPLOAD_KEY_FILE,fileList)
-            .post()
+            .head()
             .build()
             .execute(object :OnUpLoadFileListener<BaseResponse<ImgUploadBean>>{
 

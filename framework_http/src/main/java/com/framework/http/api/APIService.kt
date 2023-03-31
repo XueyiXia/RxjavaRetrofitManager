@@ -68,11 +68,15 @@ interface APIService {
      * @return
      */
     @DELETE
+    @JvmSuppressWildcards
     fun delete(
         @Url url: String,
         @QueryMap parameter: Map<String, Any>,
         @HeaderMap header: Map<String, Any>
     ): Observable<JsonElement>
+
+    @HTTP(method = "DELETE", hasBody = true)
+    fun delete(@Url url: String): Observable<JsonElement>
 
     /**
      * PUT 请求
@@ -135,5 +139,5 @@ interface APIService {
      * @return
      */
     @HEAD
-    fun head(@Url url: String): Call<Void>
+    fun head(@Url url: String): Observable<JsonElement>
 }
