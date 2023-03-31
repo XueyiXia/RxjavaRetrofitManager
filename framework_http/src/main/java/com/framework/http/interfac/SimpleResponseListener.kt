@@ -6,7 +6,7 @@ package com.framework.http.interfac
  * @time: 09:15
  * @说明: 服务器数据回调,
  */
-abstract class SimpleResponseListener<T> : ResponseListener<T> {
+open abstract class SimpleResponseListener<T> : ResponseListener<T> {
 
     override fun onSucceed(data: T, method: String) {
 

@@ -155,4 +155,9 @@ class RxHttpConfigure {
     fun getTimeUnit():TimeUnit{
         return this.timeUnit
     }
+
+
+    fun getHandler(): Handler? {
+        return handler
+    }
 }

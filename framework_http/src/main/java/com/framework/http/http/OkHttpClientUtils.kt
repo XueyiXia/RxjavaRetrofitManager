@@ -1,5 +1,6 @@
 package com.framework.http.http
 
+import com.framework.http.utils.HttpConstants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
@@ -15,8 +16,6 @@ object OkHttpClientUtils {
 
     private const val TAG="OkHttpClientUtils"
 
-    private const val mTimeOut: Long=60
-
     fun getOkHttpClientBuild(): OkHttpClient {
 
         //设置日志等级
@@ -24,9 +23,9 @@ object OkHttpClientUtils {
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
-            .readTimeout(mTimeOut, TimeUnit.SECONDS)
-            .writeTimeout(mTimeOut, TimeUnit.SECONDS)
-            .connectTimeout(mTimeOut, TimeUnit.SECONDS)
+            .readTimeout(HttpConstants.TIME_OUT, TimeUnit.SECONDS)
+            .writeTimeout(HttpConstants.TIME_OUT, TimeUnit.SECONDS)
+            .connectTimeout(HttpConstants.TIME_OUT, TimeUnit.SECONDS)
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }

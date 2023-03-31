@@ -3,6 +3,7 @@ package com.rxjava_retrofit.fragment
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -10,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.framework.http.api.BaseResponse
 import com.framework.http.http.RxHttp
 import com.framework.http.interfac.SimpleResponseListener
 import com.rxjava_retrofit.bean.HomeBean
@@ -61,6 +61,7 @@ class HomeFragment :Fragment(){
 
         parameter["num"] = "1"
         initRequestHttp()
+
     }
 
 
@@ -71,20 +72,25 @@ class HomeFragment :Fragment(){
             .setParameter(parameter)
             .get()
             .build()
-            .execute(object : SimpleResponseListener<BaseResponse<HomeBean>>() {
-                override fun onSucceed(data: BaseResponse<HomeBean>, method: String) {
+            .execute(object : SimpleResponseListener<HomeBean>() {
+                override fun onSucceed(data: HomeBean, method: String) {
                     super.onSucceed(data, method)
                     mTitle.text=data.toString()
                     Log.e(TAG,"输出的数据(onSuccess)${data}")
-                    Log.e(TAG,"输出的数据(isSuccess)${data.isSuccess()}")
 
-                    if(data.getData() is HomeBean ){
-                        val bean=data.getData()
-                        bean?.let {
-                            dataList.addAll( it.issueList[0].itemList)
-                            mHomeAdapter?.notifyItemRangeChanged(0,it.issueList[0].itemList.size)
-                        }
+                    data?.let {
+                        dataList.addAll( it.issueList[0].itemList)
+                        mHomeAdapter?.notifyItemRangeChanged(0,it.issueList[0].itemList.size)
                     }
+
+//                    if(data.getData() is HomeBean ){
+//                        val bean=data.getData()
+//                        bean?.let {
+//                             Log.e(TAG,"输出的数据(isSuccess)${data.isSuccess()}")
+//                            dataList.addAll( it.issueList[0].itemList)
+//                            mHomeAdapter?.notifyItemRangeChanged(0,it.issueList[0].itemList.size)
+//                        }
+//                    }
                 }
 
                 override fun onCompleted() {

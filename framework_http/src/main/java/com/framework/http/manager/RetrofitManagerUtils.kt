@@ -1,6 +1,7 @@
 package com.framework.http.manager
 
 import com.framework.http.http.OkHttpClientUtils
+import com.framework.http.utils.HttpConstants
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
@@ -20,7 +21,6 @@ class RetrofitManagerUtils private constructor() {
     private lateinit var mRetrofit: Retrofit
 
     companion object{
-        private const val mDateFormat:String="yyyy-MM-dd HH:mm:ss";
 //       private val mInstance : RetrofitManagerUtils by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED){
 //            RetrofitManagerUtils()
 //        }
@@ -41,7 +41,7 @@ class RetrofitManagerUtils private constructor() {
     fun getRetrofit(baseUrl:String):Retrofit{
         //创建json
         val gson: Gson = GsonBuilder()
-            .setDateFormat(mDateFormat)
+            .setDateFormat(HttpConstants.DATE_FORMAT)
             .serializeNulls()
             .setPrettyPrinting()
             .disableHtmlEscaping()

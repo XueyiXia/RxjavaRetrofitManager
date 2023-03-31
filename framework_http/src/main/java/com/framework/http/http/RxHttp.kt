@@ -1,6 +1,5 @@
 package com.framework.http.http
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.LifecycleOwner
@@ -8,17 +7,20 @@ import com.framework.http.api.APIService
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
+import com.framework.http.interfac.OnUpLoadFileListener
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
 import com.framework.http.observable.HttpObservable
 import com.framework.http.observer.HttpObserver
+import com.framework.http.upload.UploadRequestBody
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.RequestUtils
-import com.framework.http.utils.StringUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
@@ -73,6 +75,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
 
+    private var uploadResult: OnUpLoadFileListener<Any>? = null
+
     /**
      * 初始化函数
      */
@@ -113,9 +117,21 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     }
 
     /**
+     * 执行普通Http请求 上传文件
+     * @param uploadCallback OnUpLoadFileListener<T>?
+     */
+    open fun <T> execute(uploadCallback: OnUpLoadFileListener<T>?) {
+        if (uploadCallback == null) {
+            throw java.lang.NullPointerException("UploadCallback must not null!")
+        } else {
+            uploadResult = uploadCallback as OnUpLoadFileListener<Any>
+            doUpload()
+        }
+    }
+
+    /**
      * 执行请求
      */
-    @SuppressLint("CheckResult")
     private fun doRequest() {
 
         /**
@@ -149,15 +165,50 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
          */
         httpObservable.observe()
 
-//        apiObservable.map(object :io.reactivex.rxjava3.functions.Function<Any,Any>{
-//
-//            override fun apply(t: Any): Any {
-//                return t.toString()
-//            }
-//        }).onErrorResumeNext(HttpResultFunction<Any>())
-//            .compose(SchedulerUtils.ioToMainScheduler())
-//            .subscribe(httpObserver as HttpObserver<Any>)
+    }
 
+
+    /**
+     * 执行文件上传
+     */
+    private fun doUpload() {
+        /**
+         * 请求头处理
+         */
+        disposeHeader()
+
+        /**
+         * 请求参数处理
+         */
+        disposeParameter()
+
+        /**
+         * 处理文件集合
+         */
+       val fileList = disposeFileUpLoad()
+
+        /**
+         * 请求方式处理（被观察）
+         */
+        val baseUrl= getBaseUrl()!!
+        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
+        val apiService=retrofit.create(APIService::class.java)
+        val apiObservable : Observable<Any> = apiService.upload(disposeApiUrl(), parameter, header, fileList) as Observable<Any>
+
+        /**
+         * 构造 观察者
+         */
+        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner)
+
+        /**
+         * 被观察者和观察者订阅
+         */
+        val httpObservable = HttpObservable(apiObservable, httpObserver)
+
+        /**
+         * 设置监听，被观察和观察者订阅
+         */
+        httpObservable.observe()
     }
 
     /**
@@ -236,7 +287,6 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * 处理请求参数
      */
     private fun disposeParameter(){
-
         try {
             //添加基础 Parameter
             RxHttpConfigure.get().getBaseParameter()?.let {
@@ -248,6 +298,34 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             e.printStackTrace()
         }
 
+    }
+
+
+    /**
+     * 处理文件集合
+     */
+    private fun disposeFileUpLoad(): List<MultipartBody.Part>{
+        val fileList: MutableList<MultipartBody.Part> = ArrayList()
+        fileMap?.let {
+            val size = it.size
+            var index = 1
+            var file: File?
+            var requestBody: RequestBody
+
+            for (key in it.keys) {
+                file = it[key]
+                val mediaType=HttpConstants.MIME_TYPE_MULTIPART_FORM_DATA.toMediaType()
+                file?.let {
+                    requestBody =file.asRequestBody(mediaType)
+                    val uploadRequestBody=UploadRequestBody(requestBody, file, index, size, uploadResult)
+                    val part: MultipartBody.Part = MultipartBody.Part.createFormData(key, file.name, uploadRequestBody)
+                    fileList.add(part)
+                    index++
+                }
+            }
+        }
+
+        return fileList
     }
 
     /**

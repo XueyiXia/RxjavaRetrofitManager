@@ -1,7 +1,6 @@
 package com.framework.http.observer
 
 import android.util.Log
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner

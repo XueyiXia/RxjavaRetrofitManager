@@ -52,4 +52,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
     api project(':framework_http')//http框架
+
+    //图片选择的框架
+    api 'io.github.lucksiege:pictureselector:v2.7.3-rc10'
 }

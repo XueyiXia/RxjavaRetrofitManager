@@ -103,11 +103,12 @@ interface APIService {
      */
     @Multipart
     @POST
+    @JvmSuppressWildcards
     fun upload(
         @Url url: String,
         @PartMap parameter: Map<String, Any>,
         @HeaderMap header: Map<String, Any>,
-        @Part fileList: List<MultipartBody>
+        @Part fileList: List<MultipartBody.Part>
     ): Observable<JsonElement>
 
     /**

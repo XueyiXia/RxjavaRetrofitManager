@@ -17,4 +17,7 @@ object HttpConstants {
     const val TEXT_PLAIN="text/plain"
     const val APPLICATION_JSON="application/json"
     const val APPLICATION_XML="application/xml"
+    const val DATE_FORMAT:String="yyyy-MM-dd HH:mm:ss"
+    const val MIME_TYPE_MULTIPART_FORM_DATA="multipart/form-data"
+    const val UPLOAD_KEY_FILE = "file"
 }
