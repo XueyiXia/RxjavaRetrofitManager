@@ -220,9 +220,9 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private fun doDownload(){
         val file = File("")
 //        val downloadInfo = DownloadInfo(apiUrl!!, request.dir, request.filename)
-        if (!TextUtils.isEmpty(request.md5)) {
-            if (file.exists()) {
-                val fileMd5 = Md5Utils.getMD5(file)
+//        if (!TextUtils.isEmpty(request.md5)) {
+//            if (file.exists()) {
+//                val fileMd5 = Md5Utils.getMD5(file)
 //                if (request.md5.equals(fileMd5, ignoreCase = true)) {
 //                    downloadInfo.total = file.length()
 //                    downloadInfo.progress = file.length()
@@ -230,8 +230,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 //                    callback.onComplete()
 //                    return
 //                }
-            }
-        }
+//            }
+//        }
 
         /**
          * 请求方式处理（被观察）
@@ -248,12 +248,12 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 被观察者和观察者订阅
          */
-        val httpObservable = HttpObservable(apiObservable, httpObserver)
+//        val httpObservable = HttpObservable(apiObservable, httpObserver)
 
         /**
          * 设置监听，被观察和观察者订阅
          */
-        httpObservable.observe()
+//        httpObservable.observe()
 
         if (isBreakpoint) {
 
