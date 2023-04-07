@@ -66,6 +66,9 @@ class RxHttpConfigure {
      */
     private var isShowLog: Boolean = false
 
+
+    private var downloadConfigure:DownloadConfigure?=null
+
     fun init(app: Application): RxHttpConfigure {
         context = app
         handler = Handler(Looper.getMainLooper())
@@ -160,4 +163,16 @@ class RxHttpConfigure {
     fun getHandler(): Handler? {
         return handler
     }
+
+    /**
+     * 下载配置
+     * @param downloadConfigure DownloadConfigure
+     * @return RxHttpConfigure
+     */
+    fun setDownloadConfigure(downloadConfigure: DownloadConfigure): RxHttpConfigure {
+        this.downloadConfigure = downloadConfigure
+        return this
+    }
+
+    fun getDownloadConfigure()=downloadConfigure
 }
