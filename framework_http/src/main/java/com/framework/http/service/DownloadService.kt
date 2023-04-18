@@ -174,7 +174,7 @@ class DownloadService : Service(), LifecycleEventObserver {
         if(!TextUtils.isEmpty(urlLink)){
             if(urlList.contains(urlLink)){
 //                ToastHelper.toast("url:${urlLink} is exists in downloading!!!")
-                return super.onStartCommand(intent, flags, startId)
+//                return super.onStartCommand(intent, flags, startId)
             }
             urlList.add(urlLink!!)
             Log.d(TAG, "onStartCommand called,urlList-size:${urlList.size}")

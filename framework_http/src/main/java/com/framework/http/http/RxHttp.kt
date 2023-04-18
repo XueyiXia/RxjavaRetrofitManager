@@ -10,6 +10,7 @@ import com.framework.http.config.DownloadConfigure
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
+import com.framework.http.function.RetryWithDelayFunction
 import com.framework.http.interfac.OnUpLoadFileListener
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
@@ -21,12 +22,14 @@ import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
+import converter.DownloadConverter
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -236,7 +239,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         httpObservable.observe()
     }
 
-
+    var maxRetries = 5
+    var retryDelayMillis = 100L
     /**
      * 下载
      */
@@ -289,20 +293,19 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         } else {
             apiObservable = apiService.download(downloadUrl) as Observable<Any>
         }
-        /**
-         * 构造 观察者
-         */
+
+        val observableFinal = apiObservable?.map{
+            if(it is  ResponseBody){
+                val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(
+                    downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
+                downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
+            }
+        }
+
+            ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
+            ?.compose(SchedulerUtils.ioToMainScheduler())
         httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
-
-        /**
-         * 被观察者和观察者订阅
-         */
-        val httpObservable = HttpObservable(apiObservable, httpObserver)
-
-        /**
-         * 设置监听，被观察和观察者订阅
-         */
-        httpObservable.observe()
+        observableFinal?.subscribe(httpObserver)
     }
 
     /**
