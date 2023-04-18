@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.callback.DownloadCallback
+import com.framework.http.config.DownloadConfigure
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
@@ -14,17 +15,21 @@ import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
 import com.framework.http.observable.HttpObservable
 import com.framework.http.observer.HttpObserver
+import com.framework.http.scheduler.SchedulerUtils
 import com.framework.http.upload.UploadRequestBody
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -48,7 +53,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    private lateinit var lifecycleOwner: LifecycleOwner
+    private var lifecycleOwner: LifecycleOwner?=null
 
     /*标识请求的TAG*/
     private var tag: String? = null
@@ -84,6 +89,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     var isBreakpoint = false //是否断点下载，true
 
+    var downloadConfigure: DownloadConfigure?=null
+
     /**
      * 初始化函数
      */
@@ -101,6 +108,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         timeout = rxHttpBuilder.timeout
         timeUnit = rxHttpBuilder.timeUnit
         lifecycleOwner = rxHttpBuilder.lifecycleOwner
+        this.downloadConfigure=rxHttpBuilder.downloadConfigure
     }
 
     companion object {
@@ -173,7 +181,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner)
+        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner!!)
 
         /**
          * 被观察者和观察者订阅
@@ -218,7 +226,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner)
+        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner!!)
 
         /**
          * 被观察者和观察者订阅
@@ -236,18 +244,19 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * 下载
      */
     private fun doDownload(){
-        val downloadConfigure=RxHttpConfigure.get().getDownloadConfigure()
+//        val downloadConfigure=RxHttpConfigure.get().getDownloadConfigure()
 
         val dir=downloadConfigure?.directoryFile!!
-        val fileName= downloadConfigure.filename
+        val fileName= downloadConfigure?.filename!!
+        val downloadUrl=downloadConfigure?.urlLink!!
         val file = File(dir, fileName)
 
-        val downloadInfo = DownloadInfo("",dir, fileName)
+        val downloadInfo = DownloadInfo(downloadUrl,dir, fileName)
 
-        if (!TextUtils.isEmpty(downloadConfigure.md5)) {
+        if (!TextUtils.isEmpty(downloadConfigure?.md5)) {
             if (file.exists()) {
                 val fileMd5 = Md5Utils.getMD5(file)
-                if (downloadConfigure.md5.equals(fileMd5, ignoreCase = true)) {
+                if (downloadConfigure?.md5.equals(fileMd5, ignoreCase = true)) {
                     downloadInfo.total = file.length()
                     downloadInfo.progress = file.length()
                     return
@@ -265,26 +274,29 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
         var apiObservable : Observable<Any>?=null
 
+        var observable: Observable<Any>? = null
         if (isBreakpoint) {
-            apiObservable= apiService.download("", String.format("bytes=%d-", 0)) as Observable<Any>
+            observable = Observable.just(downloadUrl)
+                .flatMap { url ->
+                    val contentLength = getContentLength(url)
+                    var startPosition: Long = 0
+                    if (file.exists()) {
+                        if (contentLength == -1L || file.length() >= contentLength) {
+                            file.delete()
+                        } else {
+                            startPosition = file.length()
+                        }
+                    }
+                    Observable.just(startPosition)
+                }
+                .flatMap { position ->
+                    apiService.download(downloadUrl, String.format("bytes=%d-", position))
+                }
+                .compose(SchedulerUtils.ioToMainScheduler())
+
         } else {
-            apiObservable = apiService.download("") as Observable<Any>
+            observable = apiService.download(downloadUrl) as Observable<Any>
         }
-
-        /**
-         * 构造 观察者
-         */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner)
-
-        /**
-         * 被观察者和观察者订阅
-         */
-        val httpObservable = HttpObservable(apiObservable, httpObserver)
-
-        /**
-         * 设置监听，被观察和观察者订阅
-         */
-        httpObservable.observe()
 
     }
 

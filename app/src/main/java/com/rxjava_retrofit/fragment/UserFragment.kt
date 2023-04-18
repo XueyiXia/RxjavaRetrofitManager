@@ -36,6 +36,7 @@ class UserFragment :Fragment(){
         mBtnDownload.setOnClickListener {
             val intent= Intent(context, DownloadService::class.java)
             intent.putExtra("url", HttpApi.URL_DOWNLOAD)
+            intent.putExtra("md5","BBFDF5D996224C643402E7B1162ADC27")
             context?.startService(intent)
         }
     }

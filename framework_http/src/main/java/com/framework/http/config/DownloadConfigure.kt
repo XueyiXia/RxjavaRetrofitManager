@@ -23,6 +23,7 @@ class DownloadConfigure {
     var filename: String = ""
     var md5: String? = null
     var isBreakpoint = false
+    var urlLink:String=""
 
 
     /**
@@ -44,11 +45,22 @@ class DownloadConfigure {
 
     /**
      *
-     * @param filename String
+     * @param fileName String
      * @return DownloadConfigure
      */
-    fun filename(filename: String): DownloadConfigure {
-        this.filename = filename
+    fun setFileName(fileName: String): DownloadConfigure {
+        this.filename = fileName
+        return this
+    }
+
+
+    /**
+     *
+     * @param urlLink String
+     * @return DownloadConfigure
+     */
+    fun setDownloadUrl(urlLink: String): DownloadConfigure {
+        this.urlLink = urlLink
         return this
     }
 
@@ -81,7 +93,7 @@ class DownloadConfigure {
      * @param md5 String?
      * @return DownloadConfigure
      */
-    fun md5(md5: String?): DownloadConfigure {
+    fun setMd5(md5: String?): DownloadConfigure {
         this.md5 = md5
         return this
     }

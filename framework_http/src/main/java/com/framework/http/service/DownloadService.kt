@@ -11,7 +11,11 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.framework.http.R
+import com.framework.http.bean.DownloadInfo
 import com.framework.http.bean.NotificationInfo
+import com.framework.http.callback.DownloadCallback
+import com.framework.http.config.DownloadConfigure
+import com.framework.http.http.RxHttp
 import com.framework.http.utils.NotificationHelper
 import com.framework.http.utils.StorageHelper
 import com.framework.http.utils.StringUtils
@@ -86,42 +90,42 @@ class DownloadService : Service() {
     }
 
 
-//    private var downloadCallback = object : DownloadCallback() {
-//
-//        var url:String=""
-//
-//        override fun onStart() {
-//            handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
-//        }
-//
-//
-//        override fun onProgress(readBytes: Long, totalBytes: Long) {
-//            Log.d(TAG, "onProgress() called with: readBytes = $readBytes, totalBytes = $totalBytes")
-//            handler?.sendMessage(Message.obtain(handler, MSG_UPDATE_NOTIFICATION, Pair(readBytes, totalBytes)))
-//
-//        }
-//
-//        override fun onNext(response: Any?) {
-//            Log.d(TAG, "onNext() called with: response = $response")
-//            handler?.sendEmptyMessage(MSG_INSTALL_APK)
-//        }
-//
-//        override fun onError(e: Throwable?) {
-//            Log.d(TAG, "onError() called with: e = $e")
-//            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
-//            urlList.remove(url)
-//            Log.d(TAG, "onError() called,urlList-size:${urlList.size}")
-//        }
-//
-//        override fun onComplete() {
-//            Log.d(TAG, "onComplete() called")
-//            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
-//            urlList.remove(url)
-//            Log.d(TAG, "onComplete() called,urlList-size:${urlList.size}")
-//        }
-//
-//    }
-//
+    private var downloadCallback = object : DownloadCallback<DownloadInfo>() {
+
+        var url:String=""
+
+        override fun onStart() {
+            handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
+        }
+
+
+        override fun onProgress(readBytes: Long, totalBytes: Long) {
+            Log.d(TAG, "onProgress() called with: readBytes = $readBytes, totalBytes = $totalBytes")
+            handler?.sendMessage(Message.obtain(handler, MSG_UPDATE_NOTIFICATION, Pair(readBytes, totalBytes)))
+
+        }
+
+        override fun onNext(response: DownloadInfo?) {
+            Log.d(TAG, "onNext() called with: response = $response")
+            handler?.sendEmptyMessage(MSG_INSTALL_APK)
+        }
+
+        override fun onError(e: Throwable?) {
+            Log.d(TAG, "onError() called with: e = $e")
+            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
+            urlList.remove(url)
+            Log.d(TAG, "onError() called,urlList-size:${urlList.size}")
+        }
+
+        override fun onComplete() {
+            Log.d(TAG, "onComplete() called")
+            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
+            urlList.remove(url)
+            Log.d(TAG, "onComplete() called,urlList-size:${urlList.size}")
+        }
+
+    }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -175,6 +179,15 @@ class DownloadService : Service() {
             if (TextUtils.isEmpty(filename)) {
                 filename = UUID.randomUUID().toString()
             }
+            val downloadConfigure: DownloadConfigure = DownloadConfigure.get()
+            downloadConfigure.setDirectoryFile(StorageHelper.getExternalSandBoxPath(this, Environment.DIRECTORY_DOWNLOADS))
+            downloadConfigure.setFileName("down")
+            downloadConfigure.setDownloadUrl(urlLink)
+            downloadConfigure.setMd5(md5)
+            RxHttp.getRxHttpBuilder()
+                .setDownloadConfigure(downloadConfigure)
+                .build()
+                .execute(downloadCallback)
 //            NetworkRepository.instance.httpDownload(
 //                    context = applicationContext,
 //                    url = urlLink,

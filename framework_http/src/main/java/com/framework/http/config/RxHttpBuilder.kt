@@ -27,7 +27,7 @@ class RxHttpBuilder {
     var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    lateinit var lifecycleOwner: LifecycleOwner
+    var lifecycleOwner: LifecycleOwner?=null
 
     /*标识请求的TAG*/
     var tag: String? = null
@@ -52,6 +52,8 @@ class RxHttpBuilder {
 
     /*时间单位*/
     var timeUnit: TimeUnit? = null
+
+    var downloadConfigure:DownloadConfigure?=null
 
 
     /**
@@ -271,6 +273,15 @@ class RxHttpBuilder {
      */
     fun timeUnit(timeUnit: TimeUnit?): RxHttpBuilder {
         this.timeUnit = timeUnit
+        return this
+    }
+
+    /**
+     *
+     * @param downloadConfigure DownloadConfigure
+     */
+    fun setDownloadConfigure(downloadConfigure: DownloadConfigure): RxHttpBuilder{
+        this.downloadConfigure=downloadConfigure
         return this
     }
 

@@ -1,8 +1,11 @@
 package com.rxjava_retrofit
 
 import android.app.Application
+import android.os.Environment
+import com.framework.http.config.DownloadConfigure
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.utils.HttpConstants
+import com.framework.http.utils.StorageHelper
 import java.util.concurrent.TimeUnit
 
 /**
