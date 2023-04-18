@@ -27,7 +27,7 @@ class RxHttpBuilder {
     var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    var lifecycleOwner: LifecycleOwner?=null
+    lateinit var lifecycleOwner: LifecycleOwner
 
     /*标识请求的TAG*/
     var tag: String? = null

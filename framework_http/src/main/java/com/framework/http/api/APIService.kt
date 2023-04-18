@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.*
 
 /**
@@ -143,5 +144,5 @@ interface APIService {
      * @return
      */
     @HEAD
-    fun head(@Url url: String): Observable<JsonElement>
+    fun head(@Url url: String): Call<Void>
 }

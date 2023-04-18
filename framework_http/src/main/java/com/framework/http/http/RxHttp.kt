@@ -21,15 +21,12 @@ import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -53,7 +50,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    private var lifecycleOwner: LifecycleOwner?=null
+    private var lifecycleOwner: LifecycleOwner
 
     /*标识请求的TAG*/
     private var tag: String? = null
@@ -271,14 +268,11 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         val baseUrl= getBaseUrl()!!
         val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
         val apiService=retrofit.create(APIService::class.java)
-
         var apiObservable : Observable<Any>?=null
-
-        var observable: Observable<Any>? = null
         if (isBreakpoint) {
-            observable = Observable.just(downloadUrl)
+            apiObservable = Observable.just(downloadUrl)
                 .flatMap { url ->
-                    val contentLength = getContentLength(url)
+                    val contentLength = getContentLength(url,apiService)
                     var startPosition: Long = 0
                     if (file.exists()) {
                         if (contentLength == -1L || file.length() >= contentLength) {
@@ -295,7 +289,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
                 .compose(SchedulerUtils.ioToMainScheduler())
 
         } else {
-            observable = apiService.download(downloadUrl) as Observable<Any>
+            apiObservable = apiService.download(downloadUrl) as Observable<Any>
         }
 
     }
@@ -353,7 +347,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             }
 
             HttpMethod.HEAD -> {
-                apiObservable = apiService.head(disposeApiUrl())
+//                apiObservable = apiService.head(disposeApiUrl())
 
             }
 
@@ -448,7 +442,14 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * @throws Exception
      */
     @Throws(Exception::class)
-    private fun getContentLength(url: String): Long {
+    private fun getContentLength(url: String, apiService:APIService): Long {
+        val response = apiService.head(url).execute()
+        if (response.isSuccessful) {
+            val contentLength = response.headers()["Content-Length"]
+            if (!TextUtils.isEmpty(contentLength)) {
+                return contentLength!!.toLong()
+            }
+        }
         return -1
     }
 }

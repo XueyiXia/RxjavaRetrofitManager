@@ -1,5 +1,6 @@
 package com.framework.http.observer
 
+import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference
 class HttpObserver<T : Any> constructor(
     private val simpleResponseListener: SimpleResponseListener<T>?,
     private val tag: Any?,
-    lifecycleOwner:LifecycleOwner? ) :Observer<T> , Disposable, LifecycleEventObserver {
+    lifecycleOwner:LifecycleOwner ) :Observer<T> , Disposable, LifecycleEventObserver {
 
     companion object{
         private const val TAG="HttpObserver"
@@ -93,10 +94,14 @@ class HttpObserver<T : Any> constructor(
         when (event) {
             Event.ON_DESTROY -> {
                 //取消网络请求,tag为null取消所有网络请求,tag不为null值，取消指定的网络请求
-                RxHttpTagManager.getInstance().cancelTag(tag)
+                if(!TextUtils.isEmpty(tag.toString())){
+                    RxHttpTagManager.getInstance().removeTag(tag)
+                }else{
+                    RxHttpTagManager.getInstance().cancelTag(null)
+                }
             }
             else -> {
-                RxHttpTagManager.getInstance().cancelTag(null)
+
             }
         }
     }
