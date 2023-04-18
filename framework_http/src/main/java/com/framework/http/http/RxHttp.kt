@@ -50,7 +50,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    private var lifecycleOwner: LifecycleOwner
+    private var lifecycleOwner: LifecycleOwner?=null
 
     /*标识请求的TAG*/
     private var tag: String? = null
@@ -145,7 +145,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      *  执行普通Http请求 下载文件
      * @param downloadCallback DownloadCallback<T>?
      */
-    open fun <T : Any> execute(downloadCallback: DownloadCallback<T>?) {
+    open fun <T> execute(downloadCallback: DownloadCallback<T>?) {
         if (downloadCallback == null) {
             throw java.lang.NullPointerException("DownloadCallback must not null!")
         } else {
@@ -178,7 +178,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner!!)
+        httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
 
         /**
          * 被观察者和观察者订阅
@@ -223,7 +223,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag,lifecycleOwner!!)
+        httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
 
         /**
          * 被观察者和观察者订阅
@@ -241,8 +241,6 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * 下载
      */
     private fun doDownload(){
-//        val downloadConfigure=RxHttpConfigure.get().getDownloadConfigure()
-
         val dir=downloadConfigure?.directoryFile!!
         val fileName= downloadConfigure?.filename!!
         val downloadUrl=downloadConfigure?.urlLink!!
@@ -291,7 +289,20 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         } else {
             apiObservable = apiService.download(downloadUrl) as Observable<Any>
         }
+        /**
+         * 构造 观察者
+         */
+        httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
 
+        /**
+         * 被观察者和观察者订阅
+         */
+        val httpObservable = HttpObservable(apiObservable, httpObserver)
+
+        /**
+         * 设置监听，被观察和观察者订阅
+         */
+        httpObservable.observe()
     }
 
     /**
@@ -426,6 +437,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         }
         return apiUrl as String
     }
+
 
 
     /**

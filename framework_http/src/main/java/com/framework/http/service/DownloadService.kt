@@ -10,6 +10,9 @@ import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.framework.http.R
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.bean.NotificationInfo
@@ -30,7 +33,7 @@ import java.util.*
  * @time: 15:40
  * @说明: 下载APK
  */
-class DownloadService : Service() {
+class DownloadService : Service(), LifecycleEventObserver {
     companion object {
         const val TAG = "DownloadService"
         const val DOWNLOAD_NOTIFY_ID = 1005
@@ -186,6 +189,7 @@ class DownloadService : Service() {
             downloadConfigure.setMd5(md5)
             RxHttp.getRxHttpBuilder()
                 .setDownloadConfigure(downloadConfigure)
+                .setLifecycle(null)
                 .build()
                 .execute(downloadCallback)
 //            NetworkRepository.instance.httpDownload(
@@ -207,6 +211,10 @@ class DownloadService : Service() {
         super.onDestroy()
         handler?.removeCallbacksAndMessages(null)
         handlerThread?.quit()
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+
     }
 
 

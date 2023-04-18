@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import androidx.lifecycle.LifecycleOwner
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -68,6 +69,8 @@ class RxHttpConfigure {
 
 
     private var downloadConfigure:DownloadConfigure?=null
+
+    private lateinit var lifecycleOwner: LifecycleOwner
 
     fun init(app: Application): RxHttpConfigure {
         context = app
@@ -171,6 +174,11 @@ class RxHttpConfigure {
      */
     fun setDownloadConfigure(downloadConfigure: DownloadConfigure): RxHttpConfigure {
         this.downloadConfigure = downloadConfigure
+        return this
+    }
+
+    fun setLifecycle(lifecycleOwner: LifecycleOwner): RxHttpConfigure {
+        this.lifecycleOwner = lifecycleOwner
         return this
     }
 

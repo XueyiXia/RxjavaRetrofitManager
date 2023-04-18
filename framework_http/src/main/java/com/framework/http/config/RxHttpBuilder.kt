@@ -27,7 +27,7 @@ class RxHttpBuilder {
     var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    lateinit var lifecycleOwner: LifecycleOwner
+    var lifecycleOwner: LifecycleOwner?=null
 
     /*标识请求的TAG*/
     var tag: String? = null
@@ -131,7 +131,7 @@ class RxHttpBuilder {
      * @param baseUrl String?
      * @return Builder
      */
-    fun baseUrl(baseUrl: String?): RxHttpBuilder {
+    fun setBaseUrl(baseUrl: String?): RxHttpBuilder {
         this.baseUrl = baseUrl
         return this
     }
@@ -213,7 +213,7 @@ class RxHttpBuilder {
      * @param lifecycleOwner LifecycleOwner?
      * @return Builder
      */
-    fun setLifecycle(lifecycleOwner: LifecycleOwner): RxHttpBuilder {
+    fun setLifecycle(lifecycleOwner: LifecycleOwner?): RxHttpBuilder {
         this.lifecycleOwner = lifecycleOwner
         return this
     }

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference
 class HttpObserver<T : Any> constructor(
     private val simpleResponseListener: SimpleResponseListener<T>?,
     private val tag: Any?,
-    lifecycleOwner:LifecycleOwner ) :Observer<T> , Disposable, LifecycleEventObserver {
+    lifecycleOwner:LifecycleOwner? ) :Observer<T> , Disposable, LifecycleEventObserver {
 
     companion object{
         private const val TAG="HttpObserver"
