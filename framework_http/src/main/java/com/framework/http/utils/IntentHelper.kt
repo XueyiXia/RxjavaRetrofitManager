@@ -1,10 +1,10 @@
-package com.framework.http
+package com.framework.http.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
 
@@ -86,15 +86,12 @@ object IntentHelper {
     }
 
     //从相册中选择照片
+    @SuppressLint("IntentReset")
     fun gotoSelectPhoto(activity: Activity, requestCode: Int) {
         val intent = Intent()
         intent.type = "image/*"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent.action = Intent.ACTION_PICK
-            intent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        } else {
-            intent.action = Intent.ACTION_GET_CONTENT
-        }
+        intent.action = Intent.ACTION_PICK
+        intent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         activity.startActivityForResult(Intent.createChooser(intent, "选择图片"), requestCode)
     }
 }

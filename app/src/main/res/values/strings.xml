@@ -4,4 +4,6 @@
     <string name="navigation_malls">商城</string>
     <string name="navigation_address_book">通讯录</string>
     <string name="user">我的</string>
+    <string name="download">下载</string>
+    <string name="download_label">下载服务</string>
 </resources>

@@ -11,13 +11,10 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.framework.http.R
-import com.framework.http.bean.DownloadInfo
 import com.framework.http.bean.NotificationInfo
 import com.framework.http.utils.NotificationHelper
 import com.framework.http.utils.StorageHelper
 import com.framework.http.utils.StringUtils
-import com.framework.http.callback.DownloadCallback
-
 import java.io.File
 import java.text.DecimalFormat
 import java.util.*
@@ -89,42 +86,42 @@ class DownloadService : Service() {
     }
 
 
-    private var downloadCallback = object : DownloadCallback() {
-
-        var url:String=""
-
-        override fun onStart() {
-            handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
-        }
-
-
-        override fun onProgress(readBytes: Long, totalBytes: Long) {
-            Log.d(TAG, "onProgress() called with: readBytes = $readBytes, totalBytes = $totalBytes")
-            handler?.sendMessage(Message.obtain(handler, MSG_UPDATE_NOTIFICATION, Pair(readBytes, totalBytes)))
-
-        }
-
-        override fun onNext(response: DownloadInfo?) {
-            Log.d(TAG, "onNext() called with: response = $response")
-            handler?.sendEmptyMessage(MSG_INSTALL_APK)
-        }
-
-        override fun onError(e: Throwable?) {
-            Log.d(TAG, "onError() called with: e = $e")
-            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
-            urlList.remove(url)
-            Log.d(TAG, "onError() called,urlList-size:${urlList.size}")
-        }
-
-        override fun onComplete() {
-            Log.d(TAG, "onComplete() called")
-            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
-            urlList.remove(url)
-            Log.d(TAG, "onComplete() called,urlList-size:${urlList.size}")
-        }
-
-    }
-
+//    private var downloadCallback = object : DownloadCallback() {
+//
+//        var url:String=""
+//
+//        override fun onStart() {
+//            handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
+//        }
+//
+//
+//        override fun onProgress(readBytes: Long, totalBytes: Long) {
+//            Log.d(TAG, "onProgress() called with: readBytes = $readBytes, totalBytes = $totalBytes")
+//            handler?.sendMessage(Message.obtain(handler, MSG_UPDATE_NOTIFICATION, Pair(readBytes, totalBytes)))
+//
+//        }
+//
+//        override fun onNext(response: Any?) {
+//            Log.d(TAG, "onNext() called with: response = $response")
+//            handler?.sendEmptyMessage(MSG_INSTALL_APK)
+//        }
+//
+//        override fun onError(e: Throwable?) {
+//            Log.d(TAG, "onError() called with: e = $e")
+//            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
+//            urlList.remove(url)
+//            Log.d(TAG, "onError() called,urlList-size:${urlList.size}")
+//        }
+//
+//        override fun onComplete() {
+//            Log.d(TAG, "onComplete() called")
+//            handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
+//            urlList.remove(url)
+//            Log.d(TAG, "onComplete() called,urlList-size:${urlList.size}")
+//        }
+//
+//    }
+//
 
     override fun onBind(intent: Intent?): IBinder? {
         return null

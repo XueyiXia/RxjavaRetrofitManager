@@ -5,7 +5,7 @@ import android.text.TextUtils
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
 import com.framework.http.bean.DownloadInfo
-import com.framework.http.config.DownloadConfigure
+import com.framework.http.callback.DownloadCallback
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.enum.HttpMethod
@@ -20,7 +20,6 @@ import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -81,6 +80,8 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     private var uploadResult: OnUpLoadFileListener<Any>? = null
 
+    private var mDownloadCallback: DownloadCallback<Any>? = null
+
     var isBreakpoint = false //是否断点下载，true
 
     /**
@@ -132,6 +133,19 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         } else {
             uploadResult = uploadCallback as OnUpLoadFileListener<Any>
             doUpload()
+        }
+    }
+
+    /**
+     *  执行普通Http请求 下载文件
+     * @param downloadCallback DownloadCallback<T>?
+     */
+    open fun <T : Any> execute(downloadCallback: DownloadCallback<T>?) {
+        if (downloadCallback == null) {
+            throw java.lang.NullPointerException("DownloadCallback must not null!")
+        } else {
+            mDownloadCallback = downloadCallback as DownloadCallback<Any>
+            doDownload()
         }
     }
 
@@ -218,37 +232,29 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     }
 
 
+    /**
+     * 下载
+     */
     private fun doDownload(){
-
         val downloadConfigure=RxHttpConfigure.get().getDownloadConfigure()
-        val file = File(downloadConfigure?.dir, downloadConfigure?.filename)
-        val downloadInfo = DownloadInfo(downloadConfigure?.getUrl(), downloadConfigure?.dir, downloadConfigure?.filename)
-        if (!TextUtils.isEmpty(downloadConfigure?.md5)) {
+
+        val dir=downloadConfigure?.directoryFile!!
+        val fileName= downloadConfigure.filename
+        val file = File(dir, fileName)
+
+        val downloadInfo = DownloadInfo("",dir, fileName)
+
+        if (!TextUtils.isEmpty(downloadConfigure.md5)) {
             if (file.exists()) {
                 val fileMd5 = Md5Utils.getMD5(file)
-                if (downloadConfigure?.md5.equals(fileMd5, ignoreCase = true)) {
+                if (downloadConfigure.md5.equals(fileMd5, ignoreCase = true)) {
                     downloadInfo.total = file.length()
                     downloadInfo.progress = file.length()
-                    callback.onNext(downloadInfo as T)
-                    callback.onComplete()
                     return
                 }
             }
         }
-        val file = File("")
-//        val downloadInfo = DownloadInfo(apiUrl!!, request.dir, request.filename)
-//        if (!TextUtils.isEmpty(request.md5)) {
-//            if (file.exists()) {
-//                val fileMd5 = Md5Utils.getMD5(file)
-//                if (request.md5.equals(fileMd5, ignoreCase = true)) {
-//                    downloadInfo.total = file.length()
-//                    downloadInfo.progress = file.length()
-//                    callback.onNext(downloadInfo as T)
-//                    callback.onComplete()
-//                    return
-//                }
-//            }
-//        }
+
 
         /**
          * 请求方式处理（被观察）
@@ -256,6 +262,14 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         val baseUrl= getBaseUrl()!!
         val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
         val apiService=retrofit.create(APIService::class.java)
+
+        var apiObservable : Observable<Any>?=null
+
+        if (isBreakpoint) {
+            apiObservable= apiService.download("", String.format("bytes=%d-", 0)) as Observable<Any>
+        } else {
+            apiObservable = apiService.download("") as Observable<Any>
+        }
 
         /**
          * 构造 观察者
@@ -265,18 +279,13 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 被观察者和观察者订阅
          */
-//        val httpObservable = HttpObservable(apiObservable, httpObserver)
+        val httpObservable = HttpObservable(apiObservable, httpObserver)
 
         /**
          * 设置监听，被观察和观察者订阅
          */
-//        httpObservable.observe()
+        httpObservable.observe()
 
-        if (isBreakpoint) {
-
-        } else {
-
-        }
     }
 
     /**
@@ -428,7 +437,6 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      */
     @Throws(Exception::class)
     private fun getContentLength(url: String): Long {
-
         return -1
     }
 }

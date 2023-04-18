@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.http.*
 
 /**
@@ -135,7 +134,7 @@ interface APIService {
      */
     @Streaming
     @GET
-    fun download(@Url url: String, @HeaderMap header: MutableMap<String, Any>,@Header("RANGE") range: String): Observable<ResponseBody>
+    fun download(@Url url: String,@Header("RANGE") range: String): Observable<ResponseBody>
 
 
     /**

@@ -1,7 +1,5 @@
 package com.framework.http.bean
 
-import android.app.NotificationManager
-
 /**
  * @author: xiaxueyi
  * @date: 2023-03-31
