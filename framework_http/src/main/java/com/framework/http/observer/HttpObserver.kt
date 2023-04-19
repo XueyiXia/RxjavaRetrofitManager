@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.framework.http.callback.DownloadCallback
+import com.framework.http.interfac.HttpResponseListener
+import com.framework.http.interfac.ResponseListener
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.utils.ParseUtils
@@ -23,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 
 class HttpObserver<T : Any> constructor(
-    private val simpleResponseListener: SimpleResponseListener<T>?,
+    private val responseListener: HttpResponseListener<T>?,
     private val tag: Any?,
     lifecycleOwner:LifecycleOwner? ) :Observer<T> , Disposable, LifecycleEventObserver {
 
@@ -44,29 +47,36 @@ class HttpObserver<T : Any> constructor(
             }else{
                 RxHttpTagManager.getInstance().addTag(RxHttpTagManager.generateRandomTag(), d)
             }
+
+            onStart()
         }
     }
 
     override fun onNext(t: T) {
-        val genericType = simpleResponseListener?.let {
-            TypeUtils.getType(it.javaClass)
-        }
-        val result: T? = genericType?.let { ParseUtils.parseResponse(t.toString(), it) }
+        if(responseListener is DownloadCallback){
+            Log.e(TAG,"onNext--->> : DownloadCallback  ")
+        }else{
+            val genericType = responseListener?.let {
+                TypeUtils.getType(it.javaClass)
+            }
+            val result: T? = genericType?.let { ParseUtils.parseResponse(t.toString(), it) }
 
-        result?.let {
-            simpleResponseListener?.onSucceed(it,tag.toString())
+            result?.let {
+                responseListener?.onSucceed(it,tag.toString())
+            }
         }
+
 
         Log.e(TAG,"onNext--->> : $t  ")
     }
 
     override fun onError(e: Throwable) {
-        simpleResponseListener?.onError(e)
+        responseListener?.onError(e)
         Log.e(TAG,"onError--->> : $e  ")
     }
 
     override fun onComplete() {
-        simpleResponseListener?.onCompleted()
+        responseListener?.onCompleted()
         Log.e(TAG,"onComplete--->>: ")
     }
 
@@ -79,6 +89,10 @@ class HttpObserver<T : Any> constructor(
 
     override fun isDisposed(): Boolean {
         return upstream.get() === DisposableHelper.DISPOSED
+    }
+
+    private fun onStart() {
+        responseListener?.onStart()
     }
 
     /**

@@ -120,7 +120,7 @@ class DownloadService : Service(), LifecycleEventObserver {
             Log.d(TAG, "onError() called,urlList-size:${urlList.size}")
         }
 
-        override fun onComplete() {
+        override fun onCompleted() {
             Log.d(TAG, "onComplete() called")
             handler?.sendEmptyMessage(MSG_CANCEL_NOTIFICATION)
             urlList.remove(url)

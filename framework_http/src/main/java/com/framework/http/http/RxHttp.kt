@@ -42,7 +42,13 @@ import java.util.concurrent.TimeUnit
  */
 
 open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
-
+    companion object {
+        var maxRetries = 5
+        var retryDelayMillis = 100L
+        fun getRxHttpBuilder(): RxHttpBuilder {
+            return RxHttpBuilder()
+        }
+    }
     private var mContext: Context? = null
 
     /*请求方式*/
@@ -83,7 +89,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     private var mSimpleResponseListener: SimpleResponseListener<Any>?=null //网络回调监听
 
-    private var uploadResult: OnUpLoadFileListener<Any>? = null
+    private var mOnUpLoadFileListener: OnUpLoadFileListener<Any>? = null
 
     private var mDownloadCallback: DownloadCallback<Any>? = null
 
@@ -111,11 +117,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         this.downloadConfigure=rxHttpBuilder.downloadConfigure
     }
 
-    companion object {
-        fun getRxHttpBuilder(): RxHttpBuilder {
-            return RxHttpBuilder()
-        }
-    }
+
 
 
     /**
@@ -139,7 +141,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         if (uploadCallback == null) {
             throw java.lang.NullPointerException("UploadCallback must not null!")
         } else {
-            uploadResult = uploadCallback as OnUpLoadFileListener<Any>
+            mOnUpLoadFileListener = uploadCallback as OnUpLoadFileListener<Any>
             doUpload()
         }
     }
@@ -226,7 +228,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         /**
          * 构造 观察者
          */
-        httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
+        httpObserver = HttpObserver(mOnUpLoadFileListener,tag, lifecycleOwner)
 
         /**
          * 被观察者和观察者订阅
@@ -239,8 +241,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         httpObservable.observe()
     }
 
-    var maxRetries = 5
-    var retryDelayMillis = 100L
+
     /**
      * 下载
      */
@@ -304,7 +305,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
             ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
             ?.compose(SchedulerUtils.ioToMainScheduler())
-        httpObserver = HttpObserver(mSimpleResponseListener,tag, lifecycleOwner)
+        httpObserver = HttpObserver(mDownloadCallback,tag, lifecycleOwner)
         observableFinal?.subscribe(httpObserver)
     }
 
@@ -419,7 +420,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
                 val mediaType=HttpConstants.MIME_TYPE_MULTIPART_FORM_DATA.toMediaType()
                 file?.let {
                     requestBody =file.asRequestBody(mediaType)
-                    val uploadRequestBody=UploadRequestBody(requestBody, file, index, size, uploadResult)
+                    val uploadRequestBody=UploadRequestBody(requestBody, file, index, size, mOnUpLoadFileListener)
                     val part: MultipartBody.Part = MultipartBody.Part.createFormData(key, file.name, uploadRequestBody)
                     fileList.add(part)
                     index++

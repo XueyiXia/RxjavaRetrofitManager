@@ -1,3 +1,13 @@
 package com.framework.http.callback
 
-abstract class DownloadCallback<T> : HttpCallback<T>()
+import com.framework.http.interfac.HttpResponseListener
+ open class DownloadCallback<T> : HttpResponseListener<T>(){
+     override fun onNext(response: T?) {
+         TODO("Not yet implemented")
+     }
+
+     override fun onError(e: Throwable?) {
+         TODO("Not yet implemented")
+     }
+
+ }

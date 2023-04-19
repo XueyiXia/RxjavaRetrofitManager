@@ -98,7 +98,7 @@ class HomeFragment :Fragment(){
                     Log.e(TAG,"输出的数据(onCompleted)")
                 }
 
-                override fun onError(exception: Throwable) {
+                override fun onError(exception: Throwable?) {
                     super.onError(exception)
                     Log.e(TAG,"(onError)${exception}")
                 }

@@ -95,7 +95,7 @@ class MallsFragment :Fragment(){
             .file(HttpConstants.UPLOAD_KEY_FILE,fileList)
             .head()
             .build()
-            .execute(object :OnUpLoadFileListener<BaseResponse<ImgUploadBean>>{
+            .execute(object : OnUpLoadFileListener<BaseResponse<ImgUploadBean>>() {
 
                 override fun progress(
                     file: File?,
@@ -112,7 +112,7 @@ class MallsFragment :Fragment(){
 
                 }
 
-                override fun onError(exception: Throwable) {
+                override fun onError(exception: Throwable?) {
                     Log.e(TAG, "图片上传错误---->>${exception}")
                 }
 

@@ -8,7 +8,7 @@ import java.io.File
  * @time: 12:55
  * @说明:
  */
-interface OnUpLoadFileListener <T> : ResponseListener<T>{
+open class OnUpLoadFileListener <T> : HttpResponseListener<T>() {
 
     /**
      * 上传进度回调
@@ -19,12 +19,21 @@ interface OnUpLoadFileListener <T> : ResponseListener<T>{
      * @param currentIndex 当前下标
      * @param totalFile    总文件数
      */
-    fun progress(
+    open fun progress(
         file: File?,
         currentSize: Long,
         totalSize: Long,
         progress: Float,
         currentIndex: Int,
         totalFile: Int
-    )
+    ) {
+    }
+
+    override fun onNext(response: T?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onError(e: Throwable?) {
+        TODO("Not yet implemented")
+    }
 }
