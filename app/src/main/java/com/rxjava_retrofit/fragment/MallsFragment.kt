@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.framework.http.api.BaseResponse
 import com.framework.http.interfac.OnUpLoadFileListener
@@ -25,7 +26,6 @@ import com.rxjava_retrofit.R
 import com.yalantis.ucrop.view.OverlayView
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * @author: xiaxueyi
@@ -44,6 +44,8 @@ class MallsFragment :Fragment(){
 
     private lateinit var mBtnOpenGallery: Button
 
+    private lateinit var mTvResult: TextView
+
     val fileList: MutableList<File> = ArrayList()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_malls, container, false)
@@ -54,6 +56,8 @@ class MallsFragment :Fragment(){
         super.onViewCreated(view, savedInstanceState)
         mBtnUpload=view.findViewById(R.id.upload)
         mBtnOpenGallery=view.findViewById(R.id.open_gallery)
+        mTvResult=view.findViewById(R.id.result)
+
 
         mBtnOpenGallery.setOnClickListener {
 
@@ -109,22 +113,26 @@ class MallsFragment :Fragment(){
                     currentIndex: Int,
                     totalFile: Int
                 ) {
-                    Log.e(TAG, "图片上传进度progress---->>$progress")
+                    Log.e(TAG, "progress  图片上传进度progress---->>$progress")
                 }
 
                 override fun onSucceed(data: BaseResponse<ImgUploadBean>, method: String) {
-                    Log.e(TAG, "图片上传成功---->>${data.getData()}")
+                    Log.e(TAG, "onSucceed 图片上传成功---->>${data.getData()}")
+
+                    mTvResult.text = data?.getData().toString()
                 }
 
 
                 override fun onError(e: Throwable?) {
-                    Log.e(TAG, "图片上传错误---->>${e}")
+                    Log.e(TAG, "onError  图片上传错误---->>${e}")
+
+                    mTvResult.text = e?.message
                 }
 
 
 
                 override fun onCompleted() {
-
+                    Log.e(TAG, "onCompleted ")
                 }
 
 
