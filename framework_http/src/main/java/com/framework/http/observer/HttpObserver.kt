@@ -7,8 +7,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.callback.DownloadCallback
 import com.framework.http.interfac.HttpResponseListener
-import com.framework.http.interfac.ResponseListener
-import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.utils.ParseUtils
 import com.framework.http.utils.TypeUtils

@@ -1,12 +1,10 @@
 package com.framework.http.repository
 
 import android.content.Context
-import android.os.Environment
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.callback.DownloadCallback
 import com.framework.http.config.DownloadConfigure
 import com.framework.http.http.RxHttp
-import com.framework.http.utils.StorageHelper
 
 /**
  * @author: xiaxueyi
@@ -42,7 +40,7 @@ class NetworkRepository private constructor() {
         filename: String,
         callback: DownloadCallback<DownloadInfo>,
         md5: String? = null,
-        breakPoint: Boolean = true,
+        breakPoint: Boolean = false,
         tag: Any? = null) {
 
         val downloadConfigure: DownloadConfigure = DownloadConfigure.get()
@@ -54,6 +52,8 @@ class NetworkRepository private constructor() {
 
         RxHttp.getRxHttpBuilder()
             .setDownloadConfigure(downloadConfigure)
+            .setContext(context)
+            .setTag(tag as String?)
             .build()
             .execute(callback)
     }

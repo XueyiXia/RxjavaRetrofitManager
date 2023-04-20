@@ -223,7 +223,7 @@ class RxHttpBuilder {
      * @param tag String?
      * @return Builder
      */
-    fun tag(tag: String?): RxHttpBuilder {
+    fun setTag(tag: String?): RxHttpBuilder {
         this.tag = tag
         return this
     }
@@ -233,7 +233,7 @@ class RxHttpBuilder {
      * @param file TreeMap<String, File>?
      * @return Builder
      */
-    fun file(file: TreeMap<String, File>?): RxHttpBuilder {
+    fun setFile(file: TreeMap<String, File>?): RxHttpBuilder {
         fileMap = file
         return this
     }
@@ -244,7 +244,7 @@ class RxHttpBuilder {
      * @param fileList List<File>
      * @return Builder
      */
-    fun file(key: String, fileList: List<File>): RxHttpBuilder {
+    fun setFile(key: String, fileList: List<File>): RxHttpBuilder {
         if (fileMap == null) {
             fileMap = IdentityHashMap()
         }
@@ -261,7 +261,7 @@ class RxHttpBuilder {
      * @param timeout Long
      * @return Builder
      */
-    fun timeout(timeout: Long): RxHttpBuilder {
+    fun setTimeOut(timeout: Long): RxHttpBuilder {
         this.timeout = timeout
         return this
     }
@@ -271,7 +271,7 @@ class RxHttpBuilder {
      * @param timeUnit TimeUnit?
      * @return Builder
      */
-    fun timeUnit(timeUnit: TimeUnit?): RxHttpBuilder {
+    fun setTimeUnit(timeUnit: TimeUnit?): RxHttpBuilder {
         this.timeUnit = timeUnit
         return this
     }

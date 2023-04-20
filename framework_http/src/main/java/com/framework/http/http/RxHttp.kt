@@ -245,6 +245,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     /**
      * 下载
      */
+
     private fun doDownload(){
         val dir=downloadConfigure?.directoryFile!!
         val fileName= downloadConfigure?.filename!!
@@ -296,7 +297,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         }
 
         val observableFinal = apiObservable?.map{
-            if(it is  ResponseBody){
+            if(it is ResponseBody){
                 val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(
 
                     downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)

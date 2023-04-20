@@ -92,7 +92,7 @@ class MallsFragment :Fragment(){
         RxHttp.getRxHttpBuilder()
             .setApiUrl(HttpApi.URL_UPLOAD_IMG)
             .setLifecycle(this)
-            .file(HttpConstants.UPLOAD_KEY_FILE,fileList)
+            .setFile(HttpConstants.UPLOAD_KEY_FILE,fileList)
             .head()
             .build()
             .execute(object : OnUpLoadFileListener<BaseResponse<ImgUploadBean>>() {
