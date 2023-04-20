@@ -1,5 +1,7 @@
 package com.framework.http.bean
 
+import android.app.NotificationManager
+
 /**
  * @author: xiaxueyi
  * @date: 2023-03-31
@@ -16,7 +18,7 @@ class NotificationInfo constructor(groupId: String,
     private var groupName: String = groupName
     private var channelId: String = channelId
     private var channelName: String = channelName
-    private var importance = 0
+    private var importance = NotificationManager.IMPORTANCE_DEFAULT
 
 
     fun getGroupId(): String {

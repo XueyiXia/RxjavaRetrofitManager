@@ -1,15 +1,26 @@
 package com.rxjava_retrofit.fragment
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import com.framework.http.bean.NotificationInfo
 import com.framework.http.service.DownloadService
+import com.framework.http.utils.NotificationHelper
 import com.rxjava_retrofit.HttpApi
 import com.rxjava_retrofit.R
+
 
 /**
  * @author: xiaxueyi
@@ -24,6 +35,8 @@ class UserFragment :Fragment(){
 
     private lateinit var mBtnDownload: Button
 
+    private lateinit var mBtnNotify: Button
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_user, container, false)
         return mRootView
@@ -32,6 +45,7 @@ class UserFragment :Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBtnDownload=view.findViewById(R.id.download)
+        mBtnNotify=view.findViewById(R.id.notify)
 
         mBtnDownload.setOnClickListener {
             val intent= Intent(context, DownloadService::class.java)
@@ -39,5 +53,16 @@ class UserFragment :Fragment(){
             intent.putExtra("md5","BBFDF5D996224C643402E7B1162ADC27")
             context?.startService(intent)
         }
+
+        mBtnNotify.setOnClickListener {
+
+            context?.let {
+                val notificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            }
+
+        }
+
     }
+
 }

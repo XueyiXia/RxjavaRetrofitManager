@@ -9,6 +9,8 @@ import android.content.Intent
 import android.os.*
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -17,8 +19,7 @@ import com.framework.http.R
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.bean.NotificationInfo
 import com.framework.http.callback.DownloadCallback
-import com.framework.http.config.DownloadConfigure
-import com.framework.http.http.RxHttp
+import com.framework.http.repository.NetworkRepository
 import com.framework.http.utils.NotificationHelper
 import com.framework.http.utils.StorageHelper
 import com.framework.http.utils.StringUtils
@@ -66,6 +67,7 @@ class DownloadService : Service(), LifecycleEventObserver {
                 MSG_SHOW_NOTIFICATION -> {
                     notificationManager.notify(DOWNLOAD_NOTIFY_ID, notificationBuilder.build())
                 }
+
                 MSG_UPDATE_NOTIFICATION -> {
                     val pair = msg.obj as Pair<Long, Long>
                     val progress = pair.first
@@ -98,6 +100,7 @@ class DownloadService : Service(), LifecycleEventObserver {
         var url:String=""
 
         override fun onStart() {
+            Toast.makeText(this@DownloadService,"开始下载,可在通知栏查看进度",Toast.LENGTH_SHORT).show()
             handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
         }
 
@@ -135,6 +138,7 @@ class DownloadService : Service(), LifecycleEventObserver {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onCreate() {
         super.onCreate()
@@ -142,20 +146,14 @@ class DownloadService : Service(), LifecycleEventObserver {
         dir = StorageHelper.getExternalSandBoxPath(applicationContext, Environment.DIRECTORY_DOWNLOADS)
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationBuilder = NotificationHelper.getNotificationBuilder(
-                applicationContext,
-                NotificationInfo("001", "Category", "001", "Download")
-        )
+
+        val notificationInfo=NotificationInfo("001","Category","001","Download")
+        val pendingIntent= PendingIntent.getActivity(applicationContext, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
+
+        notificationBuilder = NotificationHelper.getNotificationBuilder(applicationContext,notificationInfo )
                 .setOnlyAlertOnce(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(
-                        PendingIntent.getActivity(
-                                applicationContext,
-                                0,
-                                Intent(),
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        )
-                )
+                .setContentIntent(pendingIntent)
                 .setContentTitle("正在下载新版本,请稍等...")
                 .setAutoCancel(true)
                 .setOngoing(true)
@@ -168,13 +166,14 @@ class DownloadService : Service(), LifecycleEventObserver {
 
     }
 
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val urlLink = intent?.getStringExtra("url")
         val md5=intent?.getStringExtra("md5")
         if(!TextUtils.isEmpty(urlLink)){
             if(urlList.contains(urlLink)){
-//                ToastHelper.toast("url:${urlLink} is exists in downloading!!!")
-//                return super.onStartCommand(intent, flags, startId)
+                Toast.makeText(this@DownloadService,"url:${urlLink} is exists in downloading!!!",Toast.LENGTH_SHORT).show()
+                return super.onStartCommand(intent, flags, startId)
             }
             urlList.add(urlLink!!)
             Log.d(TAG, "onStartCommand called,urlList-size:${urlList.size}")
@@ -182,26 +181,17 @@ class DownloadService : Service(), LifecycleEventObserver {
             if (TextUtils.isEmpty(filename)) {
                 filename = UUID.randomUUID().toString()
             }
-            val downloadConfigure: DownloadConfigure = DownloadConfigure.get()
-            downloadConfigure.setDirectoryFile(StorageHelper.getExternalSandBoxPath(this, Environment.DIRECTORY_DOWNLOADS))
-            downloadConfigure.setFileName("down")
-            downloadConfigure.setDownloadUrl(urlLink)
-            downloadConfigure.setMd5(md5)
-            RxHttp.getRxHttpBuilder()
-                .setDownloadConfigure(downloadConfigure)
-                .setLifecycle(null)
-                .build()
-                .execute(downloadCallback)
-//            NetworkRepository.instance.httpDownload(
-//                    context = applicationContext,
-//                    url = urlLink,
-//                    dir = dir,
-//                    filename = filename,
-//                    callback = downloadCallback.apply {
-//                        url=urlLink
-//                    },
-//                    md5 =md5
-//            )
+
+            NetworkRepository.getInstance().httpDownload(
+                    context = applicationContext,
+                    url = urlLink,
+                    dir = dir,
+                    filename = filename,
+                    callback = downloadCallback.apply {
+                        url=urlLink
+                    },
+                    md5 =md5
+            )
         }
         return super.onStartCommand(intent, flags, startId)
     }

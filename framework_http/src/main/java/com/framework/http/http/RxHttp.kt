@@ -9,6 +9,7 @@ import com.framework.http.callback.DownloadCallback
 import com.framework.http.config.DownloadConfigure
 import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
+import com.framework.http.converter.DownloadConverter
 import com.framework.http.enum.HttpMethod
 import com.framework.http.function.RetryWithDelayFunction
 import com.framework.http.interfac.OnUpLoadFileListener
@@ -22,7 +23,6 @@ import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
-import converter.DownloadConverter
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -298,8 +298,9 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
         val observableFinal = apiObservable?.map{
             if(it is  ResponseBody){
                 val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(
+
                     downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
-                downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
+                    downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
             }
         }
 
