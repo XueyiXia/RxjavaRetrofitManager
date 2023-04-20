@@ -10,9 +10,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.framework.http.api.BaseResponse
-import com.framework.http.http.RxHttp
 import com.framework.http.interfac.OnUpLoadFileListener
-import com.framework.http.utils.HttpConstants
+import com.framework.http.manager.RxHttpTagManager
+import com.framework.http.repository.NetworkRepository
 import com.luck.picture.lib.PictureSelector
 import com.luck.picture.lib.camera.CustomCameraType
 import com.luck.picture.lib.config.PictureConfig
@@ -24,6 +24,8 @@ import com.rxjava_retrofit.HttpApi
 import com.rxjava_retrofit.R
 import com.yalantis.ucrop.view.OverlayView
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author: xiaxueyi
@@ -89,13 +91,15 @@ class MallsFragment :Fragment(){
 
 
     private fun initRequestHttp(){
-        RxHttp.getInstance()
-            .setApiUrl(HttpApi.URL_UPLOAD_IMG)
-            .setLifecycle(this)
-            .setFile(HttpConstants.UPLOAD_KEY_FILE,fileList)
-            .head()
-            .build()
-            .execute(object : OnUpLoadFileListener<BaseResponse<ImgUploadBean>>() {
+        val params: TreeMap<String, Any> = TreeMap()
+        val tag= RxHttpTagManager.generateRandomTag()
+        NetworkRepository.getInstance().httpUpload(
+            requireContext(),
+            HttpApi.URL_UPLOAD_IMG,
+            params,
+            fileList,
+            tag,
+            object : OnUpLoadFileListener<BaseResponse<ImgUploadBean>>() {
 
                 override fun progress(
                     file: File?,
@@ -105,20 +109,25 @@ class MallsFragment :Fragment(){
                     currentIndex: Int,
                     totalFile: Int
                 ) {
-                    Log.e(TAG, "图片上传进度file---->>$file")
-                }
-
-                override fun onCompleted() {
-
-                }
-
-                override fun onError(exception: Throwable?) {
-                    Log.e(TAG, "图片上传错误---->>${exception}")
+                    Log.e(TAG, "图片上传进度progress---->>$progress")
                 }
 
                 override fun onSucceed(data: BaseResponse<ImgUploadBean>, method: String) {
                     Log.e(TAG, "图片上传成功---->>${data.getData()}")
                 }
+
+
+                override fun onError(e: Throwable?) {
+                    Log.e(TAG, "图片上传错误---->>${e}")
+                }
+
+
+
+                override fun onCompleted() {
+
+                }
+
+
             })
 
     }

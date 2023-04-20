@@ -1,10 +1,16 @@
 package com.framework.http.repository
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
+import com.framework.http.api.BaseResponse
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.callback.DownloadCallback
 import com.framework.http.config.DownloadConfigure
 import com.framework.http.http.RxHttp
+import com.framework.http.interfac.OnUpLoadFileListener
+import com.framework.http.utils.HttpConstants
+import java.io.File
+import java.util.*
 
 /**
  * @author: xiaxueyi
@@ -20,6 +26,34 @@ class NetworkRepository private constructor() {
 
     private object NetworkRepository {
         val holder = NetworkRepository()
+    }
+
+
+    /**
+     *
+     * @param context Context
+     * @param url String
+     * @param params Map<String, Any?>?
+     * @param fileList MutableList<File>
+     * @param tag Any?
+     * @param onUpLoadFileListener OnUpLoadFileListener<BaseResponse<T>>
+     */
+    inline fun <reified T> httpUpload(
+        context: Context,
+        url: String,
+        params: TreeMap<String, Any>?,
+        fileList: MutableList<File>,
+        tag: Any? = null,  onUpLoadFileListener: OnUpLoadFileListener<BaseResponse<T>>
+    ){
+
+        RxHttp.getInstance()
+            .setContext(context)
+            .setApiUrl(url)
+            .setFile(HttpConstants.UPLOAD_KEY_FILE,fileList)
+            .setParameter(params!!)
+            .setTag(tag as String?)
+            .build()
+            .execute(onUpLoadFileListener)
     }
 
 
