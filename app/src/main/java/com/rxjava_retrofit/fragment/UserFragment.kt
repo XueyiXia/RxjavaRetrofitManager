@@ -1,5 +1,6 @@
 package com.rxjava_retrofit.fragment
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,14 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import com.framework.http.bean.NotificationInfo
 import com.framework.http.service.DownloadService
-import com.framework.http.utils.NotificationHelper
 import com.rxjava_retrofit.HttpApi
 import com.rxjava_retrofit.R
+import com.rxjava_retrofit.activities.MainActivity
 
 
 /**
@@ -57,10 +56,50 @@ class UserFragment :Fragment(){
         mBtnNotify.setOnClickListener {
 
             context?.let {
-                val notificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
+                showNotification()
             }
 
+        }
+
+    }
+
+
+    private fun showNotification() {
+        context?.let {
+            val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notification: Notification
+
+//pendingIntent生成规则
+            val notifyIntent = Intent()
+            notifyIntent.setClass(it, MainActivity::class.java)
+
+            val pendingIntent = PendingIntent.getActivity(it, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel("0", "notify", NotificationManager.IMPORTANCE_DEFAULT)
+                manager.createNotificationChannel(channel)
+
+                val builder: Notification.Builder = Notification.Builder(it, "0")
+                    .setAutoCancel(true)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText("Build.VERSION_CODES.O")
+                    .setOnlyAlertOnce(true)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentIntent(pendingIntent)
+                builder.build()
+
+            } else {
+
+                val builder = NotificationCompat.Builder(it,"0")
+                builder.setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentText("test")
+                    .setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setOnlyAlertOnce(true)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentIntent(pendingIntent)
+                builder.build()
+            }
+            manager.notify(1000, notification)
         }
 
     }

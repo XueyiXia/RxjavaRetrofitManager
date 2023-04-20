@@ -1,6 +1,7 @@
 package com.framework.http.utils
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
@@ -23,31 +24,36 @@ import com.framework.http.bean.NotificationInfo
 object NotificationHelper {
 
     //获取 Notification Builder
-    @SuppressLint("WrongConstant")
     fun getNotificationBuilder(context: Context, notificationInfo: NotificationInfo): NotificationCompat.Builder {
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context)
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, notificationInfo.getChannelId())
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val group = NotificationChannelGroup(
-                notificationInfo.getGroupId(),
-                notificationInfo.getGroupName()
-            )
-            notificationManager.createNotificationChannelGroup(group)
             val channel = NotificationChannel(
                 notificationInfo.getChannelId(),
                 notificationInfo.getChannelName(),
                 notificationInfo.getImportance()
             )
-            channel.group = notificationInfo.getGroupId()
             notificationManager.createNotificationChannel(channel)
-            notificationInfo.getChannelId().let { builder.setChannelId(it) }
         }
         return builder
     }
 
+    fun getNotification(context: Context, notificationInfo: NotificationInfo): Notification {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(notificationInfo.getChannelId(), notificationInfo.getChannelName(), NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
+            val builder: Notification.Builder = Notification.Builder(context, notificationInfo.getChannelId())
+            builder.build()
+        }else{
+            val builder = NotificationCompat.Builder(context,notificationInfo.getChannelId())
+            builder.build()
+        }
+        return notification
+    }
+
     //判断通知栏功能是否开启
-    fun isNotficationEnabled(context: Context): Boolean {
+    fun isNotificationEnabled(context: Context): Boolean {
         val notificationManager: NotificationManagerCompat = NotificationManagerCompat.from(context)
         return notificationManager.areNotificationsEnabled()
     }
