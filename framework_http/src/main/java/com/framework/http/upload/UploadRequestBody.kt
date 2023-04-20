@@ -99,7 +99,7 @@ class UploadRequestBody(
                 }
                 //回调接口
                 if (uploadResult != null) {
-                    RxHttpConfigure.get().getHandler()?.post {
+                    RxHttpConfigure.getInstance().getHandler()?.post {
                         val progress = writtenBytesCount.toFloat() / totalBytesCount.toFloat()
                         uploadResult.progress(
                             file,

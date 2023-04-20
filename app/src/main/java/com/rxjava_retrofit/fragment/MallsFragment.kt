@@ -89,7 +89,7 @@ class MallsFragment :Fragment(){
 
 
     private fun initRequestHttp(){
-        RxHttp.getRxHttpBuilder()
+        RxHttp.getInstance()
             .setApiUrl(HttpApi.URL_UPLOAD_IMG)
             .setLifecycle(this)
             .setFile(HttpConstants.UPLOAD_KEY_FILE,fileList)

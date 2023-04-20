@@ -50,7 +50,7 @@ class NetworkRepository private constructor() {
         downloadConfigure.setMd5(md5)
         downloadConfigure.isBreakpoint=breakPoint
 
-        RxHttp.getRxHttpBuilder()
+        RxHttp.getInstance()
             .setDownloadConfigure(downloadConfigure)
             .setContext(context)
             .setTag(tag as String?)

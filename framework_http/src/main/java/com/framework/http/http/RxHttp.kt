@@ -11,7 +11,6 @@ import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.converter.DownloadConverter
 import com.framework.http.enum.HttpMethod
-import com.framework.http.function.RetryWithDelayFunction
 import com.framework.http.interfac.OnUpLoadFileListener
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
@@ -41,49 +40,39 @@ import java.util.concurrent.TimeUnit
  * @说明:
  */
 
-open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
+open class RxHttp constructor(builder: RxHttpBuilder){
+
+
     companion object {
-        var maxRetries = 5
-        var retryDelayMillis = 100L
-        fun getRxHttpBuilder(): RxHttpBuilder {
+        fun getInstance(): RxHttpBuilder {
             return RxHttpBuilder()
         }
     }
     private var mContext: Context? = null
 
-    /*请求方式*/
-    private var method: HttpMethod? = null
+    private var method: HttpMethod? = null //请求方式
 
     private var header: MutableMap<String, Any> = TreeMap<String,Any>()
 
     private var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
-    /*LifecycleOwner*/
-    private var lifecycleOwner: LifecycleOwner?=null
+    private var lifecycleOwner: LifecycleOwner?=null //LifecycleOwner 生命周期
 
-    /*标识请求的TAG*/
-    private var tag: String? = null
+    private var tag: String? = null //标识请求的TAG
 
-    /*文件map*/
-    private var fileMap: MutableMap<String, File>? = null
+    private var fileMap: MutableMap<String, File>? = null //文件map
 
-    /*基础URL*/
-    private var baseUrl: String? = null
+    private var baseUrl: String? = null //基础URL
 
-    /*apiUrl*/
-    private var apiUrl: String? = null
+    private var apiUrl: String? = null //apiUrl
 
-    /*String参数*/
-    private var bodyString: String? = null
+    private var bodyString: String? = null //String参数
 
-    /*是否强制JSON格式*/
-    private var isJson = false
+    private var isJson = false //是否强制JSON格式
 
-    /*超时时长*/
-    private var timeout: Long = 0
+    private var timeout: Long = 0 //超时时长
 
-    /*时间单位*/
-    private var timeUnit: TimeUnit? = null
+    private var timeUnit: TimeUnit? = null //时间单位
 
     private var httpObserver: HttpObserver<Any>? = null
 
@@ -93,28 +82,28 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
 
     private var mDownloadCallback: DownloadCallback<Any>? = null
 
-    var isBreakpoint = false //是否断点下载，true
+    private var isBreakpoint = false //是否断点下载，true
 
-    var downloadConfigure: DownloadConfigure?=null
+    private var downloadConfigure: DownloadConfigure?=null
 
     /**
      * 初始化函数
      */
     init {
-        mContext=rxHttpBuilder.mContext
-        parameter = rxHttpBuilder.parameter
-        header = rxHttpBuilder.header
-        tag = rxHttpBuilder.tag
-        fileMap = rxHttpBuilder.fileMap
-        baseUrl = rxHttpBuilder.baseUrl
-        apiUrl = rxHttpBuilder.apiUrl
-        isJson = rxHttpBuilder.isJson
-        bodyString = rxHttpBuilder.bodyString
-        method = rxHttpBuilder.method
-        timeout = rxHttpBuilder.timeout
-        timeUnit = rxHttpBuilder.timeUnit
-        lifecycleOwner = rxHttpBuilder.lifecycleOwner
-        this.downloadConfigure=rxHttpBuilder.downloadConfigure
+        mContext=builder.getContext()
+        parameter = builder.getParameter()
+        header = builder.getHeader()
+        tag = builder.getTag()
+        fileMap = builder.getFile()
+        baseUrl = builder.getBaseUrl()
+        apiUrl = builder.getApiUrl()
+        isJson = builder.getIsJson()
+        bodyString = builder.getBodyString()
+        method = builder.getMethod()
+        timeout = builder.getTimeOut()
+        timeUnit = builder.getTimeUnit()
+        lifecycleOwner = builder.getLifecycleOwner()
+        downloadConfigure=builder.getDownloadConfigure()
     }
 
 
@@ -305,7 +294,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
             }
         }
 
-            ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
+//            ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
             ?.compose(SchedulerUtils.ioToMainScheduler())
         httpObserver = HttpObserver(mDownloadCallback,tag, lifecycleOwner)
         observableFinal?.subscribe(httpObserver)
@@ -394,7 +383,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
     private fun disposeParameter(){
         try {
             //添加基础 Parameter
-            RxHttpConfigure.get().getBaseParameter()?.let {
+            RxHttpConfigure.getInstance().getBaseParameter()?.let {
                 if (it.isNotEmpty()) {
                     parameter.putAll(it)
                 }
@@ -450,7 +439,7 @@ open class RxHttp constructor(rxHttpBuilder: RxHttpBuilder) {
      * 获取基础URL
      * @return String?
      */
-    private fun getBaseUrl()=if(TextUtils.isEmpty(baseUrl)) RxHttpConfigure.get().getBaseUrl() else baseUrl
+    private fun getBaseUrl()=if(TextUtils.isEmpty(baseUrl)) RxHttpConfigure.getInstance().getBaseUrl() else baseUrl
 
 
     /**

@@ -43,7 +43,7 @@ class AppLoader :Application() {
         headerMap["Accept"] = "Application/Json"
 
         //必须初始化
-        RxHttpConfigure.get()
+        RxHttpConfigure.getInstance()
             .setBaseUrl(HttpApi.BASE_URL)
             .setBaseHeader(headerMap)
             .setTimeout(HttpConstants.TIME_OUT)

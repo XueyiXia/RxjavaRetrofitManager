@@ -15,17 +15,15 @@ import java.util.concurrent.TimeUnit
  * @time: 15:57
  * @说明:
  */
-
+@SuppressLint("StaticFieldLeak")
 class RxHttpConfigure {
 
-    @SuppressLint("StaticFieldLeak")
     private object Config {
-        val rxHttpConfigure = RxHttpConfigure()
+        val holder = RxHttpConfigure()
     }
+
     companion object {
-        fun get(): RxHttpConfigure {
-            return Config.rxHttpConfigure
-        }
+        fun getInstance()=Config.holder
     }
 
     /**
@@ -66,7 +64,6 @@ class RxHttpConfigure {
      * 是否显示Log
      */
     private var isShowLog: Boolean = false
-
 
     private var downloadConfigure:DownloadConfigure?=null
 

@@ -66,10 +66,11 @@ class HomeFragment :Fragment(){
 
 
     private fun initRequestHttp(){
-        RxHttp.getRxHttpBuilder()
+        RxHttp.getInstance()
             .setApiUrl(HttpApi.test)
             .setLifecycle(this)
             .setParameter(parameter)
+            .setContext(requireContext())
             .get()
             .build()
             .execute(object : SimpleResponseListener<HomeBean>() {

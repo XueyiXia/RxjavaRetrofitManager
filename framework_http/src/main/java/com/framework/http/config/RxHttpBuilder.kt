@@ -17,43 +17,48 @@ import java.util.concurrent.TimeUnit
 
 class RxHttpBuilder {
 
-    var mContext: Context? = null
+    private var mContext: Context? = null
 
     /*请求方式*/
-    var method: HttpMethod? = null
+    private var method: HttpMethod? = null
 
-    var header: MutableMap<String, Any> = TreeMap<String,Any>()
+    private var header: MutableMap<String, Any> = TreeMap<String,Any>()
 
-    var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
+    private var parameter: MutableMap<String, Any> = TreeMap<String,Any>()
 
     /*LifecycleOwner*/
-    var lifecycleOwner: LifecycleOwner?=null
+    private var lifecycleOwner: LifecycleOwner?=null
 
     /*标识请求的TAG*/
-    var tag: String? = null
+    private var tag: String? = null
 
     /*文件map*/
-    var fileMap: MutableMap<String, File>? = null
+    private var fileMap: MutableMap<String, File>? = null
 
     /*基础URL*/
-    var baseUrl: String? = null
+    private var baseUrl: String? = null
 
     /*apiUrl*/
-    var apiUrl: String? = null
+    private var apiUrl: String? = null
 
     /*String参数*/
-    var bodyString: String? = null
+    private var bodyString: String? = null
 
     /*是否强制JSON格式*/
-    var isJson = false
+    private var isJson = false
 
     /*超时时长*/
-    var timeout: Long = 0
+    private var timeout: Long = 0
 
     /*时间单位*/
-    var timeUnit: TimeUnit? = null
+    private var timeUnit: TimeUnit? = null
 
-    var downloadConfigure:DownloadConfigure?=null
+    private var downloadConfigure:DownloadConfigure?=null
+
+
+    fun build(): RxHttp {
+        return RxHttp(this)
+    }
 
 
     /**
@@ -65,8 +70,8 @@ class RxHttpBuilder {
         mContext = context
         return this
     }
-    fun getContext(): Context {
-        return mContext!!
+    fun getContext(): Context? {
+        return mContext
     }
 
 
@@ -79,6 +84,8 @@ class RxHttpBuilder {
         this.method=method;
         return this;
     }
+
+    fun getMethod()= method
 
 
     /**
@@ -136,6 +143,8 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getBaseUrl()=baseUrl
+
 
     /**
      * API URL
@@ -147,20 +156,17 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getApiUrl()=apiUrl
+
     /**
      * 增加 Parameter 不断叠加参数 包括基础参数
      * @param parameter TreeMap<String, Any>?
      * @return Builder
      */
     fun addParameter(parameter: TreeMap<String, Any>?): RxHttpBuilder {
-        if (this.parameter == null) {
-            this.parameter = TreeMap()
-        }
-        this.parameter!!.putAll((parameter)!!)
+        this.parameter.putAll((parameter)!!)
         return this
     }
-
-
 
 
     /**
@@ -172,6 +178,8 @@ class RxHttpBuilder {
         this.parameter=parameter;
         return this
     }
+
+    fun getParameter()=parameter
 
     /**
      * 设置String 类型参数  覆盖之前设置  isJson:是否强制JSON格式    bodyString设置后Parameter则无效
@@ -185,16 +193,17 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getIsJson()=isJson
+
+    fun getBodyString()=bodyString
+
     /**
      * 增加 Header 不断叠加 Header 包括基础 Header
      * @param header TreeMap<String, Any>?
      * @return Builder
      */
     fun addHeader(header: TreeMap<String, Any>?): RxHttpBuilder {
-        if (this.header == null) {
-            this.header = sortedMapOf()
-        }
-        this.header!!.putAll((header)!!)
+        this.header.putAll((header)!!)
         return this
     }
 
@@ -208,6 +217,8 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getHeader()=header
+
     /**
      * LifecycleProvider
      * @param lifecycleOwner LifecycleOwner?
@@ -218,6 +229,8 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getLifecycleOwner()=lifecycleOwner
+
     /**
      * tag
      * @param tag String?
@@ -227,6 +240,8 @@ class RxHttpBuilder {
         this.tag = tag
         return this
     }
+
+    fun getTag()=tag
 
     /**
      * 文件集合
@@ -256,6 +271,8 @@ class RxHttpBuilder {
         return this
     }
 
+    fun getFile()=fileMap
+
     /**
      * 超时时长
      * @param timeout Long
@@ -265,6 +282,9 @@ class RxHttpBuilder {
         this.timeout = timeout
         return this
     }
+
+
+    fun getTimeOut()=timeout
 
     /**
      * 时间单位
@@ -276,6 +296,10 @@ class RxHttpBuilder {
         return this
     }
 
+
+    fun getTimeUnit()=timeUnit
+
+
     /**
      *
      * @param downloadConfigure DownloadConfigure
@@ -286,7 +310,5 @@ class RxHttpBuilder {
     }
 
 
-    fun build(): RxHttp {
-        return RxHttp(this)
-    }
+    fun getDownloadConfigure()=downloadConfigure
 }
