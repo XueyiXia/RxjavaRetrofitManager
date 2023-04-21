@@ -53,6 +53,7 @@ class HttpObserver<T : Any> constructor(
     override fun onNext(t: T) {
         if(responseListener is DownloadCallback){
             Log.e(TAG,"onNext--->> : DownloadCallback  ")
+            responseListener.onSucceed(t,tag.toString())
         }else{
             val genericType = responseListener?.let {
                 TypeUtils.getType(it.javaClass)

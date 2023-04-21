@@ -258,7 +258,6 @@ open class RxHttp constructor(builder: RxHttpBuilder){
             }
         }
 
-
         /**
          * 请求方式处理（被观察）
          */
@@ -279,9 +278,8 @@ open class RxHttp constructor(builder: RxHttpBuilder){
                         }
                     }
                     Observable.just(startPosition)
-                }
-                .flatMap { position ->
-                    apiService.download(downloadUrl, String.format("bytes=%d-", position))
+
+                }.flatMap { position -> apiService.download(downloadUrl, String.format("bytes=%d-", position))
                 }.subscribeOn(Schedulers.io())
 
         } else {
@@ -290,9 +288,7 @@ open class RxHttp constructor(builder: RxHttpBuilder){
 
         val observableFinal = apiObservable?.map{
             if(it is ResponseBody){
-                val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(
-                    downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
-
+                val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
                     downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
             }
         }
