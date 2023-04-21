@@ -12,13 +12,13 @@ open class Platform {
     }
 
     internal class Java : Platform() {
-        override fun defaultCallbackExecutor(): Executor? {
+        override fun defaultCallbackExecutor(): Executor {
             return Executor { command -> Executors.newCachedThreadPool().execute(command) }
         }
     }
 
     internal class Android : Platform() {
-        override fun defaultCallbackExecutor(): Executor? {
+        override fun defaultCallbackExecutor(): Executor {
             return MainThreadExecutor()
         }
 
