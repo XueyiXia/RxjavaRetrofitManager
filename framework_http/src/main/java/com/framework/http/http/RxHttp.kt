@@ -11,10 +11,13 @@ import com.framework.http.config.RxHttpBuilder
 import com.framework.http.config.RxHttpConfigure
 import com.framework.http.converter.DownloadConverter
 import com.framework.http.enum.HttpMethod
+import com.framework.http.function.RetryWithDelayFunction
 import com.framework.http.interfac.OnUpLoadFileListener
 import com.framework.http.interfac.SimpleResponseListener
 import com.framework.http.manager.RetrofitManagerUtils
 import com.framework.http.observable.HttpObservable
+import com.framework.http.observable.HttpObservable.Companion.maxRetries
+import com.framework.http.observable.HttpObservable.Companion.retryDelayMillis
 import com.framework.http.observer.HttpObserver
 import com.framework.http.scheduler.SchedulerUtils
 import com.framework.http.upload.UploadRequestBody
@@ -105,9 +108,6 @@ open class RxHttp constructor(builder: RxHttpBuilder){
         lifecycleOwner = builder.getLifecycleOwner()
         downloadConfigure=builder.getDownloadConfigure()
     }
-
-
-
 
     /**
      * 执行网络请求
@@ -209,10 +209,7 @@ open class RxHttp constructor(builder: RxHttpBuilder){
         /**
          * 请求方式处理（被观察）
          */
-        val baseUrl= getBaseUrl()!!
-        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
-        val apiService=retrofit.create(APIService::class.java)
-        val apiObservable : Observable<Any> = apiService.upload(disposeApiUrl(), parameter, header, fileList) as Observable<Any>
+        val apiObservable : Observable<Any> = getApiService().upload(disposeApiUrl(), parameter, header, fileList) as Observable<Any>
 
         /**
          * 构造 观察者
@@ -258,9 +255,8 @@ open class RxHttp constructor(builder: RxHttpBuilder){
         /**
          * 请求方式处理（被观察）
          */
-        val baseUrl= getBaseUrl()!!
-        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
-        val apiService=retrofit.create(APIService::class.java)
+        val apiService=getApiService()
+
         var apiObservable : Observable<Any>?=null
         if (isBreakpoint) {
             apiObservable = Observable.just(downloadUrl)
@@ -294,10 +290,21 @@ open class RxHttp constructor(builder: RxHttpBuilder){
             }
         }
 
-//            ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
+            ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
             ?.compose(SchedulerUtils.ioToMainScheduler())
         httpObserver = HttpObserver(mDownloadCallback,tag, lifecycleOwner)
         observableFinal?.subscribe(httpObserver)
+    }
+
+
+
+    /**
+     * 获取API 服务
+     * @return APIService
+     */
+    private fun getApiService(): APIService {
+        val retrofit = RetrofitManagerUtils.getInstance().getRetrofit(getBaseUrl()!!)
+        return retrofit.create(APIService::class.java)
     }
 
     /**
@@ -319,11 +326,10 @@ open class RxHttp constructor(builder: RxHttpBuilder){
             requestBody = bodyString?.toRequestBody(mediaType.toMediaType())
         }
 
-        val baseUrl= getBaseUrl()!!
-        val retrofit=RetrofitManagerUtils.getInstance().getRetrofit(baseUrl)
-        val apiService=retrofit.create(APIService::class.java)
+        val apiService=getApiService()
 
         var apiObservable: Observable<JsonElement>? = null
+
         when (method) {
             HttpMethod.GET ->{
                 apiObservable = apiService.get(disposeApiUrl(), parameter, header)
@@ -350,11 +356,6 @@ open class RxHttp constructor(builder: RxHttpBuilder){
 
             HttpMethod.PUT -> {
                 apiObservable = apiService.put(disposeApiUrl(), parameter, header)
-            }
-
-            HttpMethod.HEAD -> {
-//                apiObservable = apiService.head(disposeApiUrl())
-
             }
 
             else -> { //默认get 请求
