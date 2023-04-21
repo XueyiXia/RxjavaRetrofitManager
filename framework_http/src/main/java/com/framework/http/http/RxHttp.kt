@@ -26,6 +26,7 @@ import com.framework.http.utils.Md5Utils
 import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -246,6 +247,8 @@ open class RxHttp constructor(builder: RxHttpBuilder){
                 if (downloadConfigure?.md5.equals(fileMd5, ignoreCase = true)) {
                     downloadInfo.total = file.length()
                     downloadInfo.progress = file.length()
+                    mDownloadCallback?.onNext(downloadInfo)
+                    mDownloadCallback?.onCompleted()
                     return
                 }
             }
@@ -257,7 +260,8 @@ open class RxHttp constructor(builder: RxHttpBuilder){
          */
         val apiService=getApiService()
 
-        var apiObservable : Observable<Any>?=null
+        var apiObservable : Observable<ResponseBody>?=null
+
         if (isBreakpoint) {
             apiObservable = Observable.just(downloadUrl)
                 .flatMap { url ->
@@ -275,10 +279,9 @@ open class RxHttp constructor(builder: RxHttpBuilder){
                 .flatMap { position ->
                     apiService.download(downloadUrl, String.format("bytes=%d-", position))
                 }
-                .compose(SchedulerUtils.ioToMainScheduler())
 
         } else {
-            apiObservable = apiService.download(downloadUrl) as Observable<Any>
+            apiObservable = apiService.download(downloadUrl)
         }
 
         val observableFinal = apiObservable?.map{
