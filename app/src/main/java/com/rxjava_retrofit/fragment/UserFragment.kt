@@ -15,7 +15,9 @@ import android.widget.Button
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import com.framework.http.bean.NotificationInfo
 import com.framework.http.service.DownloadService
+import com.framework.http.utils.NotificationHelper
 import com.rxjava_retrofit.HttpApi
 import com.rxjava_retrofit.R
 import com.rxjava_retrofit.activities.MainActivity
@@ -57,6 +59,23 @@ class UserFragment :Fragment(){
 
             context?.let {
                 showNotification()
+
+
+//               var notificationManager =it. getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//                val notificationInfo= NotificationInfo("001","Category","001","Download")
+//                val pendingIntent= PendingIntent.getActivity(it, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
+//
+//                var notificationBuilder = NotificationHelper.getNotificationBuilder(it,notificationInfo )
+//                    .setOnlyAlertOnce(true)
+//                    .setSmallIcon(com.framework.http.R.mipmap.ic_launcher)
+//                    .setContentIntent(pendingIntent)
+//                    .setContentTitle("正在下载新版本,请稍等...")
+//                    .setAutoCancel(true)
+//                    .setOngoing(true)
+//                    .setProgress(100, 0, false);
+//
+//                notificationManager.notify(20, notificationBuilder.build())
             }
 
         }
@@ -69,7 +88,7 @@ class UserFragment :Fragment(){
             val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification: Notification
 
-//pendingIntent生成规则
+            //pendingIntent生成规则
             val notifyIntent = Intent()
             notifyIntent.setClass(it, MainActivity::class.java)
 
@@ -85,6 +104,7 @@ class UserFragment :Fragment(){
                     .setOnlyAlertOnce(true)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentIntent(pendingIntent)
+                    .setProgress(100, 0, false);
                 builder.build()
 
             } else {
@@ -97,6 +117,7 @@ class UserFragment :Fragment(){
                     .setOnlyAlertOnce(true)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentIntent(pendingIntent)
+                    .setProgress(100, 0, false);
                 builder.build()
             }
             manager.notify(1000, notification)

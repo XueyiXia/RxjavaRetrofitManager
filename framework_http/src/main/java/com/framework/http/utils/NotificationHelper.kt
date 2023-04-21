@@ -1,6 +1,5 @@
 package com.framework.http.utils
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
@@ -26,7 +25,7 @@ object NotificationHelper {
     //获取 Notification Builder
     fun getNotificationBuilder(context: Context, notificationInfo: NotificationInfo): NotificationCompat.Builder {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, notificationInfo.getChannelId())
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context,"0")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 notificationInfo.getChannelId(),
