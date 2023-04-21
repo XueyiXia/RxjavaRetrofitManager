@@ -1,7 +1,9 @@
 package com.framework.http.http
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.TextUtils
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.framework.http.api.APIService
 import com.framework.http.bean.DownloadInfo
@@ -27,6 +29,7 @@ import com.framework.http.utils.RequestUtils
 import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -233,6 +236,7 @@ open class RxHttp constructor(builder: RxHttpBuilder){
      * 下载
      */
 
+    @SuppressLint("CheckResult")
     private fun doDownload(){
         val dir=downloadConfigure?.directoryFile!!
         val fileName= downloadConfigure?.filename!!
@@ -278,7 +282,7 @@ open class RxHttp constructor(builder: RxHttpBuilder){
                 }
                 .flatMap { position ->
                     apiService.download(downloadUrl, String.format("bytes=%d-", position))
-                }
+                }.subscribeOn(Schedulers.io())
 
         } else {
             apiObservable = apiService.download(downloadUrl)
@@ -287,16 +291,20 @@ open class RxHttp constructor(builder: RxHttpBuilder){
         val observableFinal = apiObservable?.map{
             if(it is ResponseBody){
                 val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(
-
                     downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
+
                     downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
             }
         }
 
             ?.retryWhen(RetryWithDelayFunction(maxRetries,retryDelayMillis))
             ?.compose(SchedulerUtils.ioToMainScheduler())
+
+        if (mContext is LifecycleOwner) {
+            lifecycleOwner=mContext as LifecycleOwner
+        }
         httpObserver = HttpObserver(mDownloadCallback,tag, lifecycleOwner)
-        observableFinal?.subscribe(httpObserver)
+        httpObserver?.let { observableFinal?.subscribeWith(it) }
     }
 
 

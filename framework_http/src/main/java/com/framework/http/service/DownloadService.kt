@@ -209,7 +209,7 @@ class DownloadService : Service(), LifecycleEventObserver {
     private fun showNotification(context: Context, notificationInfo: NotificationInfo):Notification {
         val contentTitle="正在下载新版本,请稍等..."
         //pendingIntent生成规则
-        val pendingIntent= PendingIntent.getActivity(applicationContext, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent= PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
         context.let {
             notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(notificationInfo.getChannelId(), notificationInfo.getChannelName(), NotificationManager.IMPORTANCE_DEFAULT)

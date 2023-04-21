@@ -14,13 +14,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.reflect.Type
 
-class DownloadConverter<T>(private val downloadRequest: DownloadConfigure, private val callback: DownloadCallback<T>) :
-    IConverter<T> {
+class DownloadConverter<T>(private val downloadRequest: DownloadConfigure, private val callback: DownloadCallback<T>) {
 
     private val downloadInfo= DownloadInfo(downloadRequest.urlLink, downloadRequest.directoryFile, downloadRequest.filename)
 
     @Throws(Exception::class)
-    override fun convert(body: ResponseBody, type: Type): T {
+    fun convert(body: ResponseBody, type: Type): T {
         try {
             val fileDir = File(downloadInfo.dir)
             if (!fileDir.exists()) {
@@ -37,15 +36,23 @@ class DownloadConverter<T>(private val downloadRequest: DownloadConfigure, priva
                 0L
             }
             val fos = FileOutputStream(file, downloadRequest.isBreakpoint)
+
             val progressResponseBody = ProgressResponseBody(body, object : ProgressCallback {
                 override fun onProgress(readBytes: Long, totalBytes: Long) {
                     downloadInfo.progress=currentProgress+readBytes
-                    Platform.get().defaultCallbackExecutor()!!.execute { callback.onProgress(downloadInfo.progress, currentProgress+totalBytes) }
+                    Platform.get().defaultCallbackExecutor()?.execute {
+                        callback.onProgress(downloadInfo.progress,
+                            currentProgress+totalBytes) }
                 }
             })
             downloadInfo.total = currentProgress + progressResponseBody.contentLength()
-            Platform.get().defaultCallbackExecutor()?.execute { callback.onProgress(currentProgress,downloadInfo.total) }
+
+            Platform.get().defaultCallbackExecutor()?.execute {
+                callback.onProgress(currentProgress,downloadInfo.total)
+            }
+
             val sink = fos.sink().buffer()
+
             sink.writeAll(progressResponseBody.source())
             sink.flush()
             sink.close()
