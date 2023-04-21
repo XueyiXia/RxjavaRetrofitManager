@@ -1,9 +1,7 @@
 package com.framework.http.service
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.*
@@ -20,7 +18,6 @@ import com.framework.http.bean.DownloadInfo
 import com.framework.http.bean.NotificationInfo
 import com.framework.http.callback.DownloadCallback
 import com.framework.http.repository.NetworkRepository
-import com.framework.http.utils.NotificationHelper
 import com.framework.http.utils.StorageHelper
 import com.framework.http.utils.StringUtils
 import java.io.File
@@ -47,7 +44,6 @@ class DownloadService : Service(), LifecycleEventObserver {
     lateinit var dir: String
     lateinit var filename: String
 
-    lateinit var notificationBuilder: NotificationCompat.Builder
     lateinit var notificationManager: NotificationManager
     private var handlerThread: HandlerThread? = null
     private var handler: DownloadHandler? = null
@@ -55,7 +51,10 @@ class DownloadService : Service(), LifecycleEventObserver {
     private var urlList= mutableListOf<String>()
 
 
+    private lateinit var notification: Notification
 
+    private lateinit var mNotificationBuilder: Notification.Builder
+    private lateinit var mNotificationCompatBuilder: NotificationCompat.Builder
 
     /**
      * 处理更新通知栏的操作放在子线程操作，避免影响主线程
@@ -65,7 +64,7 @@ class DownloadService : Service(), LifecycleEventObserver {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 MSG_SHOW_NOTIFICATION -> {
-                    notificationManager.notify(DOWNLOAD_NOTIFY_ID, notificationBuilder.build())
+                    notificationManager.notify(DOWNLOAD_NOTIFY_ID, notification)
                 }
 
                 MSG_UPDATE_NOTIFICATION -> {
@@ -81,8 +80,13 @@ class DownloadService : Service(), LifecycleEventObserver {
                     } else {
                         applicationContext.resources.getString(R.string.download_success)
                     }
-                    notificationBuilder.setContentText(content).setProgress(100, percentInt, false)
-                    notificationManager.notify(DOWNLOAD_NOTIFY_ID, notificationBuilder.build())
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                        mNotificationBuilder.setContentText(content).setProgress(100, percentInt, false)
+                    }else{
+                        mNotificationCompatBuilder.setContentText(content).setProgress(100, percentInt, false)
+                    }
+                    notificationManager.notify(DOWNLOAD_NOTIFY_ID, notification)
                 }
                 MSG_CANCEL_NOTIFICATION -> {
                     notificationManager.cancel(DOWNLOAD_NOTIFY_ID)
@@ -146,19 +150,8 @@ class DownloadService : Service(), LifecycleEventObserver {
         dir = StorageHelper.getExternalSandBoxPath(applicationContext, Environment.DIRECTORY_DOWNLOADS)
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         val notificationInfo=NotificationInfo("001","Category","001","Download")
-        val pendingIntent= PendingIntent.getActivity(applicationContext, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
-
-        notificationBuilder = NotificationHelper.getNotificationBuilder(applicationContext,notificationInfo )
-                .setOnlyAlertOnce(true)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .setContentTitle("正在下载新版本,请稍等...")
-                .setAutoCancel(true)
-                .setOngoing(true)
-                .setProgress(100, 0, false);
-
+        showNotification(applicationContext,notificationInfo)
 
         val handlerThread = HandlerThread("DownloadHandlerThread")
         handlerThread.start()
@@ -207,5 +200,47 @@ class DownloadService : Service(), LifecycleEventObserver {
 
     }
 
+
+    /**
+     *
+     * @param context Context
+     * @param notificationInfo NotificationInfo
+     */
+    private fun showNotification(context: Context, notificationInfo: NotificationInfo):Notification {
+        val contentTitle="正在下载新版本,请稍等..."
+        //pendingIntent生成规则
+        val pendingIntent= PendingIntent.getActivity(applicationContext, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
+        context.let {
+            notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(notificationInfo.getChannelId(), notificationInfo.getChannelName(), NotificationManager.IMPORTANCE_DEFAULT)
+
+                notificationManager.createNotificationChannel(channel)
+
+                mNotificationBuilder = Notification.Builder(it, "0")
+                    .setAutoCancel(true)
+                    .setContentTitle(contentTitle)
+                    .setOnlyAlertOnce(true)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentIntent(pendingIntent)
+                    .setProgress(100, 0, false);
+                mNotificationBuilder.build()
+
+            } else {
+
+                mNotificationCompatBuilder = NotificationCompat.Builder(it,"0")
+                mNotificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                    .setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setOnlyAlertOnce(true)
+                    .setContentTitle(contentTitle)
+                    .setContentIntent(pendingIntent)
+                    .setProgress(100, 0, false);
+                mNotificationCompatBuilder.build()
+            }
+        }
+
+
+        return notification
+    }
 
 }
