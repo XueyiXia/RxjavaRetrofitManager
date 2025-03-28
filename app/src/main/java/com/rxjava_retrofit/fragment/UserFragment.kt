@@ -68,7 +68,7 @@ class UserFragment :Fragment(){
 
                 var notificationBuilder = NotificationHelper.getNotificationBuilder(it,notificationInfo )
                     .setOnlyAlertOnce(true)
-                    .setSmallIcon(com.framework.http.R.mipmap.ic_launcher)
+                    .setSmallIcon(0)
                     .setContentIntent(pendingIntent)
                     .setContentTitle("正在下载新版本,请稍等...")
                     .setAutoCancel(true)

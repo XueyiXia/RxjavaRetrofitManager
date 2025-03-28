@@ -236,7 +236,7 @@ open class RxHttp constructor(builder: RxHttpBuilder){
      * 下载
      */
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SuspiciousIndentation")
     private fun doDownload(){
         val dir=downloadConfigure?.directoryFile!!
         val fileName= downloadConfigure?.filename!!
@@ -288,8 +288,8 @@ open class RxHttp constructor(builder: RxHttpBuilder){
 
         val observableFinal = apiObservable?.map{
             if(it is ResponseBody){
-                val downloadConverter: DownloadConverter<DownloadInfo> = DownloadConverter(downloadConfigure!!, mDownloadCallback as DownloadCallback<DownloadInfo>)
-                    downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<DownloadInfo>).type)
+                val downloadConverter: DownloadConverter<out Any?> = DownloadConverter(downloadConfigure!!, mDownloadCallback as DownloadCallback<*>)
+                    downloadConverter.convert(it, (mDownloadCallback as DownloadCallback<*>).type)
             }
         }
 

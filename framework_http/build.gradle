@@ -1,23 +1,19 @@
-import com.framework.versionplugin.AndroidX
-import com.framework.versionplugin.BuildVersions
-import com.framework.versionplugin.OkHttp
-import com.framework.versionplugin.Retrofit
-import com.framework.versionplugin.Rxjava3
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+    id 'kotlin-kapt'
 }
+group = 'com.github.XueyiXia'
+version = '1.0'
 
 android {
     namespace 'com.framework.http'
-    compileSdk BuildVersions.compileSdk
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
-        minSdk BuildVersions.minSdk
-        targetSdk BuildVersions.targetSdk
-        versionCode BuildVersions.versionCode
-        versionName BuildVersions.versionName
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,29 +30,31 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation AndroidX.coreKtx
-    implementation AndroidX.appcompat
-    implementation AndroidX.recyclerview
-    implementation AndroidX.material
-    implementation AndroidX.constraintLayout
+    implementation (libs.coreKtx)
+    implementation (libs.appcompat)
+    implementation (libs.recyclerview)
+    implementation (libs.material)
+    implementation (libs.constraintlayout)
 
-    implementation Retrofit.retrofit
-    implementation Retrofit.converter_gson
-    implementation Retrofit.adapter_rxjava3
-    implementation Retrofit.converter_scalars
 
-    implementation Rxjava3.rxjava
-    implementation Rxjava3.rxAndroid
-    implementation Rxjava3.gson
-    implementation Rxjava3.rxLifecycle
+    implementation (libs.retrofit)
+    implementation (libs.converterGson)
+    implementation (libs.adapter.rxjava3)
+    implementation (libs.converter.scalars)
+
+
+    implementation (libs.rxjava)
+    implementation (libs.rxAndroid)
+    implementation (libs.gson)
+    implementation (libs.rxLifecycle)
 
     //OKHttp3
-    implementation OkHttp.okhttp3
-    implementation OkHttp.okio
-    implementation OkHttp.logging_interceptor
+    implementation (libs.okhttp3)
+    implementation (libs.okio)
+    implementation (libs.logging.interceptor)
 }

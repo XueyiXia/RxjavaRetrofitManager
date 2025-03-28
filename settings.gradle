@@ -13,8 +13,13 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url "https://jitpack.io" }
     }
+
+    versionCatalogs {
+        create("libs") {
+            from(files("./libs.versions.toml"))
+        }
+    }
 }
 rootProject.name = "As_RxjavaRetrofitMaster"
 include ':app'
-includeBuild("VersionPlugin")
 include ':framework_http'

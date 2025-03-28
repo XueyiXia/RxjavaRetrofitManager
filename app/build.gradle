@@ -1,9 +1,8 @@
-import com.framework.versionplugin.AndroidX
-import com.framework.versionplugin.BuildVersions
-
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id("org.jetbrains.kotlin.android")
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
 }
 
 group = 'com.github.XueyiXia'
@@ -11,14 +10,12 @@ version = '1.0'
 
 android {
     namespace 'com.rxjava_retrofit'
-    compileSdk BuildVersions.compileSdk
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
         applicationId "com.rxjava_retrofit"
-        minSdk BuildVersions.minSdk
-        targetSdk BuildVersions.targetSdk
-        versionCode BuildVersions.versionCode
-        versionName BuildVersions.versionName
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,22 +31,20 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-
-    implementation AndroidX.coreKtx
-    implementation AndroidX.appcompat
-    implementation AndroidX.recyclerview
-    implementation AndroidX.material
-    implementation AndroidX.constraintLayout
-
+    implementation (libs.coreKtx)
+    implementation (libs.appcompat)
+    implementation (libs.recyclerview)
+    implementation (libs.material)
+    implementation (libs.constraintlayout)
 
     //圖片加載
-    implementation 'com.github.bumptech.glide:glide:4.14.2'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+    implementation(libs.glide)
+    kapt(libs.glideCompiler)
 
     api project(':framework_http')//http框架
 

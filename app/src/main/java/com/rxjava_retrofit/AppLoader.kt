@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit
 class AppLoader :Application() {
 
 
-
-
     override fun onCreate() {
         super.onCreate()
     }
