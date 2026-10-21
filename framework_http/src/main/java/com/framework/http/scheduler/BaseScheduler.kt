@@ -1,7 +1,6 @@
 package com.framework.http.scheduler
 
 import io.reactivex.rxjava3.core.*
-import org.reactivestreams.Publisher
 
 /**
  * 统一 RxJava 调度器基类。
@@ -23,7 +22,7 @@ abstract class BaseScheduler<T : Any> protected constructor(
             .observeOn(observeOnScheduler)
     }
 
-    override fun apply(upstream: Flowable<T>): Publisher<T> {
+    override fun apply(upstream: Flowable<T>): Flowable<T> {
         return upstream
             .subscribeOn(subscribeOnScheduler)
             .observeOn(observeOnScheduler)

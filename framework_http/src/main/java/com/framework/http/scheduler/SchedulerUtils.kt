@@ -8,23 +8,23 @@ package com.framework.http.scheduler
  */
 object SchedulerUtils {
 
-    fun <T> ioToMainScheduler(): IoMainScheduler<T> {
+    fun <T : Any> ioToMainScheduler(): IoMainScheduler<T> {
         return IoMainScheduler()
     }
 
-    fun <T> newThreadScheduler(): NewThreadMainScheduler<T> {
+    fun <T : Any> newThreadScheduler(): NewThreadMainScheduler<T> {
         return NewThreadMainScheduler()
     }
 
-    fun <T> singleMainScheduler(): SingleMainScheduler<T> {
+    fun <T : Any> singleMainScheduler(): SingleMainScheduler<T> {
         return SingleMainScheduler()
     }
 
-    fun <T> computationScheduler(): ComputationMainScheduler<T> {
+    fun <T : Any> computationScheduler(): ComputationMainScheduler<T> {
         return ComputationMainScheduler()
     }
 
-    fun <T> trampolineMainScheduler(): TrampolineMainScheduler<T> {
+    fun <T : Any> trampolineMainScheduler(): TrampolineMainScheduler<T> {
         return TrampolineMainScheduler()
     }
 }
