@@ -8,7 +8,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.framework.http.callback.DownloadCallback
 import com.framework.http.interfac.HttpResponseListener
 import com.framework.http.manager.RxHttpTagManager
-import com.framework.http.utils.ParseUtils
 import com.framework.http.utils.TypeUtils
 import com.google.gson.Gson
 import io.reactivex.rxjava3.core.Observer
@@ -25,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference
  * @time: 16:54
  * @说明: 创建观察者基类
  */
-
 class HttpObserver<T : Any> constructor(
     private val responseListener: HttpResponseListener<T>?,
     private val tag: Any?,
@@ -55,6 +53,7 @@ class HttpObserver<T : Any> constructor(
 
     override fun onNext(t: T) {
         val tagName = tag?.toString() ?: ""
+
         if (responseListener is DownloadCallback) {
             Log.e(TAG, "onNext--->> : DownloadCallback")
             responseListener.onSucceed(t, tagName)
@@ -62,6 +61,7 @@ class HttpObserver<T : Any> constructor(
         }
 
         val genericType = responseListener?.type ?: TypeUtils.getType(responseListener?.javaClass ?: t::class.java)
+
         val parsedValue: Any? = when (genericType) {
             String::class.java -> t.toString()
             JSONObject::class.java -> if (t is String) JSONObject(t) else JSONObject(t.toString())
@@ -75,13 +75,13 @@ class HttpObserver<T : Any> constructor(
             }
         }
 
-        val result: T? = if (parsedValue is T) {
-            parsedValue
+        val result = parsedValue as? T
+        if (result != null) {
+            responseListener?.onSucceed(result, tagName)
         } else {
-            t
+            responseListener?.onSucceed(t, tagName)
         }
 
-        responseListener?.onSucceed(result ?: t, tagName)
         Log.e(TAG, "onNext--->> : $t")
     }
 
@@ -129,6 +129,7 @@ class HttpObserver<T : Any> constructor(
                 }
             }
             else -> {
+                // no-op
             }
         }
     }
