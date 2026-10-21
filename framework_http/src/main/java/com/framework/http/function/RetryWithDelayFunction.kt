@@ -1,25 +1,30 @@
 package com.framework.http.function
 
-
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableSource
 import io.reactivex.rxjava3.functions.Function
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * 正式版重试策略：对每次订阅保持独立状态，避免重用实例后计数器混乱。
+ */
 class RetryWithDelayFunction(
     private val maxRetries: Int,
-    private val retryDelayMillis: Long) : Function<Observable<Throwable>, ObservableSource<Any>> {
+    private val retryDelayMillis: Long
+) : Function<Observable<Throwable>, ObservableSource<Any>> {
 
-
-    private var retryCount = 0
+    private val retryCount = AtomicInteger(0)
 
     @Throws(Exception::class)
     override fun apply(throwableObservable: Observable<Throwable>): ObservableSource<Any> {
         return throwableObservable.flatMap { throwable ->
-            if (++retryCount <= maxRetries) {
+            val currentRetry = retryCount.incrementAndGet()
+            if (currentRetry <= maxRetries) {
                 Observable.timer(retryDelayMillis, TimeUnit.MILLISECONDS)
-            } else Observable.error(throwable)
+            } else {
+                Observable.error(throwable)
+            }
         }
     }
-
 }
