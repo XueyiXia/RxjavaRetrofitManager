@@ -47,7 +47,9 @@ class ProgressResponseBody(private val responseBody: ResponseBody, private val c
                 }
 
                 totalBytesRead += bytesRead
-                val shouldReport = totalBytesRead == contentLength() || (totalBytesRead - lastProgressBytes) >= minProgressStepBytes
+                val shouldReport = totalBytesRead == contentLength() ||
+                    (totalBytesRead - lastProgressBytes) >= minProgressStepBytes ||
+                    (contentLength() > 0 && totalBytesRead * 100 / contentLength() != (lastProgressBytes * 100 / contentLength()))
                 if (shouldReport) {
                     lastProgressBytes = totalBytesRead
                     callback?.onProgress(totalBytesRead, contentLength())

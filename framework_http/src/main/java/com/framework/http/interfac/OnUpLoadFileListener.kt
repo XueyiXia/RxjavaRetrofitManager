@@ -8,7 +8,7 @@ import java.io.File
  * @time: 12:55
  * @说明:
  */
-open class OnUpLoadFileListener <T> : HttpResponseListener<T>() {
+open class OnUpLoadFileListener<T> : HttpResponseListener<T>() {
 
     /**
      * 上传进度回调
@@ -30,10 +30,10 @@ open class OnUpLoadFileListener <T> : HttpResponseListener<T>() {
     }
 
     override fun onNext(response: T?) {
-        TODO("Not yet implemented")
+        // 默认实现为空，避免强制子类必须实现。
     }
 
     override fun onError(e: Throwable?) {
-        TODO("Not yet implemented")
+        // 默认实现为空，避免强制子类必须实现。
     }
 }

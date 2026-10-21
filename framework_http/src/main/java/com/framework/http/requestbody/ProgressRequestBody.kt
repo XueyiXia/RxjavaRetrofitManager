@@ -50,7 +50,9 @@ class ProgressRequestBody(private val requestBody: RequestBody, private val call
             override fun write(source: Buffer, byteCount: Long) {
                 super.write(source, byteCount)
                 totalBytesWrite += byteCount
-                val shouldReport = totalBytesWrite == contentLength() || (totalBytesWrite - lastProgressBytes) >= minProgressStepBytes
+                val shouldReport = totalBytesWrite == contentLength() ||
+                    (totalBytesWrite - lastProgressBytes) >= minProgressStepBytes ||
+                    (contentLength() > 0 && totalBytesWrite * 100 / contentLength() != (lastProgressBytes * 100 / contentLength()))
                 if (shouldReport) {
                     lastProgressBytes = totalBytesWrite
                     callback?.onProgress(totalBytesWrite, contentLength())

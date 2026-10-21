@@ -1,7 +1,6 @@
 package com.framework.http.repository
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import com.framework.http.api.BaseResponse
 import com.framework.http.bean.DownloadInfo
 import com.framework.http.callback.DownloadCallback
@@ -28,7 +27,6 @@ class NetworkRepository private constructor() {
         val holder = NetworkRepository()
     }
 
-
     /**
      *
      * @param context Context
@@ -43,19 +41,18 @@ class NetworkRepository private constructor() {
         url: String,
         params: TreeMap<String, Any>?,
         fileList: MutableList<File>,
-        tag: Any? = null,  onUpLoadFileListener: OnUpLoadFileListener<BaseResponse<T>>
-    ){
-
+        tag: Any? = null,
+        onUpLoadFileListener: OnUpLoadFileListener<BaseResponse<T>>
+    ) {
         RxHttp.getInstance()
-            .setContext(context)
+            .setContext(context.applicationContext)
             .setApiUrl(url)
-            .setFile(HttpConstants.UPLOAD_KEY_FILE,fileList)
-            .setParameter(params!!)
-            .setTag(tag as String?)
+            .setFile(HttpConstants.UPLOAD_KEY_FILE, fileList)
+            .setParameter(params ?: TreeMap())
+            .setTag(tag?.toString())
             .build()
             .execute(onUpLoadFileListener)
     }
-
 
     /**
      * 下载
@@ -75,21 +72,21 @@ class NetworkRepository private constructor() {
         callback: DownloadCallback<DownloadInfo>,
         md5: String? = null,
         breakPoint: Boolean = false,
-        tag: Any? = null) {
-
-        val downloadConfigure: DownloadConfigure = DownloadConfigure.get()
-        downloadConfigure.setDirectoryFile(dir)
-        downloadConfigure.setFileName(filename)
-        downloadConfigure.setDownloadUrl(url)
-        downloadConfigure.setMd5(md5)
-        downloadConfigure.isBreakpoint=breakPoint
+        tag: Any? = null
+    ) {
+        val downloadConfigure = DownloadConfigure().apply {
+            setDirectoryFile(dir)
+            setFileName(filename)
+            setDownloadUrl(url)
+            setMd5(md5)
+            isBreakpoint = breakPoint
+        }
 
         RxHttp.getInstance()
             .setDownloadConfigure(downloadConfigure)
-            .setContext(context)
-            .setTag(tag as String?)
+            .setContext(context.applicationContext)
+            .setTag(tag?.toString())
             .build()
             .execute(callback)
     }
-
 }
