@@ -4,8 +4,8 @@ import io.reactivex.rxjava3.core.*
 import org.reactivestreams.Publisher
 
 /**
- * 统一调度器基类：统一处理 subscribeOn / observeOn，避免重复样板代码。
- * 让各具体调度器仅保留自身的线程选择逻辑，职责更清晰。
+ * 统一 RxJava 调度器基类。
+ * 这里保留通用的 Transformer 应用逻辑，避免各具体调度器重复实现。
  */
 abstract class BaseScheduler<T> protected constructor(
     private val subscribeOnScheduler: Scheduler,

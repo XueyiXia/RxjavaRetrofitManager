@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * 正式版重试策略：对每次订阅保持独立状态，避免重用实例后计数器混乱。
+ * 明确的重试策略，避免重用实例导致计数器混乱。
  */
 class RetryWithDelayFunction(
     private val maxRetries: Int,

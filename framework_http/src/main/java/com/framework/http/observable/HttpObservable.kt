@@ -7,63 +7,37 @@ import com.framework.http.observer.HttpObserver
 import com.framework.http.scheduler.SchedulerUtils
 import io.reactivex.rxjava3.core.Observable
 
-
 /**
- * @author: xiaxueyi
- * @date: 2023-02-28
- * @time: 16:57
- * @说明:   网络请求Observable(被监听者)
- * * 调度顺序
- * 1.map()
- * 2.onErrorResumeNext()
- * 3.doOnDispose()
- * 4.observe()
+ * 网络请求被观察者。
+ * 修正泛型链路，统一处理 map / retry / dispose / scheduler，避免 T 泛型错位。
  */
+class HttpObservable<T : Any> constructor(
+    private val apiObservable: Observable<T>?,
+    private val httpObserver: HttpObserver<T>?
+) {
 
-class HttpObservable  constructor(private val apiObservable: Observable<Any>?, private val httpObserver: HttpObserver<Any>?){
-
-    companion object{
+    companion object {
         var maxRetries = 5
         var retryDelayMillis = 100L
     }
 
-
-    /**
-     *  Map 操作符，被观察数据再次进行处理，生成新的被观察者，发送到观察者中进行处理，即在HttpObserver回调
-     * @return Observable<Any>?
-     */
-    private fun map(): Observable<Any>? {
-        return apiObservable?.map { t ->
-            t.toString()
-//            GsonBuilder().disableHtmlEscaping().create().toJson(t.toString())
-        }
+    private fun map(): Observable<T>? {
+        return apiObservable?.map { it }
     }
 
-    /**
-     *
-     * @return Observable<Any> ?
-     */
-    private fun onErrorResumeNext(): Observable<Any> ?{
-        val httpResultFunction= HttpResultFunction<Any>()
+    private fun onErrorResumeNext(): Observable<T>? {
+        val httpResultFunction = HttpResultFunction<T>()
         return map()?.onErrorResumeNext(httpResultFunction)
     }
 
-
-    /**
-     * 订阅
-     * @return Observable<Any>?
-     */
-    private fun doOnDispose(): Observable<Any>? {
-        val onDisposeAction=OnDisposeAction(httpObserver)
+    private fun doOnDispose(): Observable<T>? {
+        val onDisposeAction = OnDisposeAction(httpObserver)
         return onErrorResumeNext()?.doOnDispose(onDisposeAction)
     }
 
-    /**
-     * 被观察者和观察者订阅
-     */
     fun observe() {
         if (httpObserver != null) {
-            val retryWithDelayFunction=RetryWithDelayFunction(maxRetries,retryDelayMillis)
+            val retryWithDelayFunction = RetryWithDelayFunction(maxRetries, retryDelayMillis)
             doOnDispose()
                 ?.retryWhen(retryWithDelayFunction)
                 ?.compose(SchedulerUtils.ioToMainScheduler())
