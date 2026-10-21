@@ -24,7 +24,6 @@ import java.io.File
 import java.text.DecimalFormat
 import java.util.*
 
-
 /**
  * @author: xiaxueyi
  * @date: 2023-03-30
@@ -48,8 +47,7 @@ class DownloadService : Service(), LifecycleEventObserver {
     private var handlerThread: HandlerThread? = null
     private var handler: DownloadHandler? = null
 
-    private var urlList= mutableListOf<String>()
-
+    private var urlList = mutableListOf<String>()
 
     private lateinit var notification: Notification
 
@@ -81,9 +79,9 @@ class DownloadService : Service(), LifecycleEventObserver {
                         applicationContext.resources.getString(R.string.download_success)
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         mNotificationBuilder.setContentText(content).setProgress(100, percentInt, false)
-                    }else{
+                    } else {
                         mNotificationCompatBuilder.setContentText(content).setProgress(100, percentInt, false)
                     }
                     notificationManager.notify(DOWNLOAD_NOTIFY_ID, notification)
@@ -98,21 +96,19 @@ class DownloadService : Service(), LifecycleEventObserver {
         }
     }
 
-
     private var downloadCallback = object : DownloadCallback<DownloadInfo>() {
 
-        var url:String=""
+        var url: String = ""
 
         override fun onStart() {
-            Toast.makeText(this@DownloadService,"开始下载,可在通知栏查看进度",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@DownloadService, "开始下载,可在通知栏查看进度", Toast.LENGTH_SHORT).show()
             handler?.sendEmptyMessage(MSG_SHOW_NOTIFICATION)
         }
 
-
         override fun onProgress(readBytes: Long, totalBytes: Long) {
             Log.d(TAG, "onProgress() called with: readBytes = $readBytes, totalBytes = $totalBytes")
+            handler?.removeMessages(MSG_UPDATE_NOTIFICATION)
             handler?.sendMessage(Message.obtain(handler, MSG_UPDATE_NOTIFICATION, Pair(readBytes, totalBytes)))
-
         }
 
         override fun onNext(response: DownloadInfo?) {
@@ -133,14 +129,11 @@ class DownloadService : Service(), LifecycleEventObserver {
             urlList.remove(url)
             Log.d(TAG, "onComplete() called,urlList-size:${urlList.size}")
         }
-
     }
-
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-
 
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -150,23 +143,21 @@ class DownloadService : Service(), LifecycleEventObserver {
         dir = StorageHelper.getExternalSandBoxPath(applicationContext, Environment.DIRECTORY_DOWNLOADS)
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationInfo=NotificationInfo("001","Category","001","Download")
-        showNotification(applicationContext,notificationInfo)
+        val notificationInfo = NotificationInfo("001", "Category", "001", "Download")
+        showNotification(applicationContext, notificationInfo)
 
-        val handlerThread = HandlerThread("DownloadHandlerThread")
-        handlerThread.start()
-        handler = DownloadHandler(handlerThread.looper)
-
+        handlerThread = HandlerThread("DownloadHandlerThread")
+        handlerThread?.start()
+        handler = DownloadHandler(handlerThread!!.looper)
     }
-
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val urlLink = intent?.getStringExtra("url")
-        val md5=intent?.getStringExtra("md5")
-        if(!TextUtils.isEmpty(urlLink)){
-            if(urlList.contains(urlLink)){
-                Toast.makeText(this@DownloadService,"url:${urlLink} is exists in downloading!!!",Toast.LENGTH_SHORT).show()
-                return super.onStartCommand(intent, flags, startId)
+        val md5 = intent?.getStringExtra("md5")
+        if (!TextUtils.isEmpty(urlLink)) {
+            if (urlList.contains(urlLink)) {
+                Toast.makeText(this@DownloadService, "url:${urlLink} is exists in downloading!!!", Toast.LENGTH_SHORT).show()
+                return START_NOT_STICKY
             }
             urlList.add(urlLink!!)
             Log.d(TAG, "onStartCommand called,urlList-size:${urlList.size}")
@@ -176,40 +167,38 @@ class DownloadService : Service(), LifecycleEventObserver {
             }
 
             NetworkRepository.getInstance().httpDownload(
-                    context = applicationContext,
-                    url = urlLink,
-                    dir = dir,
-                    filename = filename,
-                    callback = downloadCallback.apply {
-                        url=urlLink
-                    },
-                    md5 =md5
+                context = applicationContext,
+                url = urlLink,
+                dir = dir,
+                filename = filename,
+                callback = downloadCallback.apply {
+                    url = urlLink
+                },
+                md5 = md5
             )
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_NOT_STICKY
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
         handler?.removeCallbacksAndMessages(null)
-        handlerThread?.quit()
+        handlerThread?.quitSafely()
+        handlerThread = null
+        handler = null
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-
     }
-
 
     /**
      *
      * @param context Context
      * @param notificationInfo NotificationInfo
      */
-    private fun showNotification(context: Context, notificationInfo: NotificationInfo):Notification {
-        val contentTitle="正在下载新版本,请稍等..."
-        //pendingIntent生成规则
-        val pendingIntent= PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
+    private fun showNotification(context: Context, notificationInfo: NotificationInfo): Notification {
+        val contentTitle = "正在下载新版本,请稍等..."
+        val pendingIntent = PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT)
         context.let {
             notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(notificationInfo.getChannelId(), notificationInfo.getChannelName(), NotificationManager.IMPORTANCE_DEFAULT)
@@ -222,25 +211,21 @@ class DownloadService : Service(), LifecycleEventObserver {
                     .setOnlyAlertOnce(true)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentIntent(pendingIntent)
-                    .setProgress(100, 0, false);
+                    .setProgress(100, 0, false)
                 mNotificationBuilder.build()
 
             } else {
-
-                mNotificationCompatBuilder = NotificationCompat.Builder(it,"0")
+                mNotificationCompatBuilder = NotificationCompat.Builder(it, "0")
                 mNotificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher)
                     .setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())
                     .setOnlyAlertOnce(true)
                     .setContentTitle(contentTitle)
                     .setContentIntent(pendingIntent)
-                    .setProgress(100, 0, false);
+                    .setProgress(100, 0, false)
                 mNotificationCompatBuilder.build()
             }
         }
-
-
         return notification
     }
-
 }

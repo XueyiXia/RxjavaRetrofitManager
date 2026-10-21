@@ -10,6 +10,8 @@ class ProgressResponseBody(private val responseBody: ResponseBody, private val c
 
     private var progressSource: BufferedSource? = null
     private var contentLength = 0L
+    private var lastProgressBytes = 0L
+    private val minProgressStepBytes = 32L * 1024
 
     override fun contentType(): MediaType? {
         return responseBody.contentType()
@@ -35,14 +37,19 @@ class ProgressResponseBody(private val responseBody: ResponseBody, private val c
     private fun source(source: Source): Source {
         return object : ForwardingSource(source) {
             var totalBytesRead = 0L
-            var lastBytesRead = 0L
 
             @Throws(IOException::class)
             override fun read(sink: Buffer, byteCount: Long): Long {
                 val bytesRead = super.read(sink, byteCount)
-                lastBytesRead = totalBytesRead
-                totalBytesRead += if (bytesRead != -1L) bytesRead else 0
-                if (totalBytesRead != lastBytesRead) {
+                if (bytesRead == -1L) {
+                    callback?.onProgress(contentLength(), contentLength())
+                    return bytesRead
+                }
+
+                totalBytesRead += bytesRead
+                val shouldReport = totalBytesRead == contentLength() || (totalBytesRead - lastProgressBytes) >= minProgressStepBytes
+                if (shouldReport) {
+                    lastProgressBytes = totalBytesRead
                     callback?.onProgress(totalBytesRead, contentLength())
                 }
                 return bytesRead
@@ -57,5 +64,4 @@ class ProgressResponseBody(private val responseBody: ResponseBody, private val c
             e.printStackTrace()
         }
     }
-
 }

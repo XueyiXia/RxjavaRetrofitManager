@@ -10,6 +10,8 @@ class ProgressRequestBody(private val requestBody: RequestBody, private val call
 
     private var progressSink: BufferedSink? = null
     private var contentLength = 0L
+    private var lastProgressBytes = 0L
+    private val minProgressStepBytes = 32L * 1024
 
     override fun contentType(): MediaType? {
         return requestBody.contentType()
@@ -43,18 +45,17 @@ class ProgressRequestBody(private val requestBody: RequestBody, private val call
     private fun sink(sink: Sink): Sink {
         return object : ForwardingSink(sink) {
             var totalBytesWrite = 0L
-            var lastBytesWrite = 0L
 
             @Throws(IOException::class)
             override fun write(source: Buffer, byteCount: Long) {
                 super.write(source, byteCount)
-                lastBytesWrite = totalBytesWrite
                 totalBytesWrite += byteCount
-                if (totalBytesWrite != lastBytesWrite) {
+                val shouldReport = totalBytesWrite == contentLength() || (totalBytesWrite - lastProgressBytes) >= minProgressStepBytes
+                if (shouldReport) {
+                    lastProgressBytes = totalBytesWrite
                     callback?.onProgress(totalBytesWrite, contentLength())
                 }
             }
         }
     }
-
 }

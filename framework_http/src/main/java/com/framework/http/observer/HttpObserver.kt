@@ -10,10 +10,13 @@ import com.framework.http.interfac.HttpResponseListener
 import com.framework.http.manager.RxHttpTagManager
 import com.framework.http.utils.ParseUtils
 import com.framework.http.utils.TypeUtils
+import com.google.gson.Gson
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.internal.disposables.DisposableHelper
 import io.reactivex.rxjava3.internal.util.EndConsumerHelper
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -26,10 +29,11 @@ import java.util.concurrent.atomic.AtomicReference
 class HttpObserver<T : Any> constructor(
     private val responseListener: HttpResponseListener<T>?,
     private val tag: Any?,
-    lifecycleOwner:LifecycleOwner? ) :Observer<T> , Disposable, LifecycleEventObserver {
+    lifecycleOwner: LifecycleOwner?
+) : Observer<T>, Disposable, LifecycleEventObserver {
 
-    companion object{
-        private const val TAG="HttpObserver"
+    companion object {
+        private const val TAG = "HttpObserver"
     }
 
     private val upstream = AtomicReference<Disposable>()
@@ -42,41 +46,53 @@ class HttpObserver<T : Any> constructor(
         if (EndConsumerHelper.setOnce(upstream, d, javaClass)) {
             if (tag != null) {
                 RxHttpTagManager.getInstance().addTag(tag, d)
-            }else{
+            } else {
                 RxHttpTagManager.getInstance().addTag(RxHttpTagManager.generateRandomTag(), d)
             }
-
             onStart()
         }
     }
 
     override fun onNext(t: T) {
-        if(responseListener is DownloadCallback){
-            Log.e(TAG,"onNext--->> : DownloadCallback  ")
-            responseListener.onSucceed(t,tag.toString())
-        }else{
-            val genericType = responseListener?.let {
-                TypeUtils.getType(it.javaClass)
-            }
-            val result: T? = genericType?.let { ParseUtils.parseResponse(t.toString(), it) }
+        val tagName = tag?.toString() ?: ""
+        if (responseListener is DownloadCallback) {
+            Log.e(TAG, "onNext--->> : DownloadCallback")
+            responseListener.onSucceed(t, tagName)
+            return
+        }
 
-            result?.let {
-                responseListener?.onSucceed(it,tag.toString())
+        val genericType = responseListener?.type ?: TypeUtils.getType(responseListener?.javaClass ?: t::class.java)
+        val parsedValue: Any? = when (genericType) {
+            String::class.java -> t.toString()
+            JSONObject::class.java -> if (t is String) JSONObject(t) else JSONObject(t.toString())
+            JSONArray::class.java -> if (t is String) JSONArray(t) else JSONArray(t.toString())
+            else -> {
+                try {
+                    Gson().fromJson(t.toString(), genericType)
+                } catch (_: Exception) {
+                    t
+                }
             }
         }
 
+        val result: T? = if (parsedValue is T) {
+            parsedValue
+        } else {
+            t
+        }
 
-        Log.e(TAG,"onNext--->> : $t  ")
+        responseListener?.onSucceed(result ?: t, tagName)
+        Log.e(TAG, "onNext--->> : $t")
     }
 
     override fun onError(e: Throwable) {
         responseListener?.onError(e)
-        Log.e(TAG,"onError--->> : $e  ")
+        Log.e(TAG, "onError--->> : $e")
     }
 
     override fun onComplete() {
         responseListener?.onCompleted()
-        Log.e(TAG,"onComplete--->>: ")
+        Log.e(TAG, "onComplete--->>: ")
     }
 
     override fun dispose() {
@@ -103,18 +119,16 @@ class HttpObserver<T : Any> constructor(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Event) {
-        Log.e(TAG,"source--->>: $source   event--->>: $event")
+        Log.e(TAG, "source--->>: $source   event--->>: $event")
         when (event) {
             Event.ON_DESTROY -> {
-                //取消网络请求,tag为null取消所有网络请求,tag不为null值，取消指定的网络请求
-                if(!TextUtils.isEmpty(tag.toString())){
+                if (!TextUtils.isEmpty(tag.toString())) {
                     RxHttpTagManager.getInstance().removeTag(tag)
-                }else{
+                } else {
                     RxHttpTagManager.getInstance().cancelTag(null)
                 }
             }
             else -> {
-
             }
         }
     }

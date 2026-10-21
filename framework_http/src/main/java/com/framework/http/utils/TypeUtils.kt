@@ -2,6 +2,7 @@ package com.framework.http.utils
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+
 /**
  * @author: xiaxueyi
  * @date: 2023-02-22
@@ -11,31 +12,38 @@ import java.lang.reflect.Type
 object TypeUtils {
 
     /**
-     *
-     * @param subclass Class<*>
-     * @return Type
+     * 安全解析泛型参数，优先查找父类/接口中的真实泛型类型。
      */
     fun getType(subclass: Class<*>): Type {
-        val superclass = subclass.genericSuperclass
-        return if (superclass is Class<*>) {
-            subclass
-        } else {
-            val parameterized = superclass as ParameterizedType
-            parameterized.actualTypeArguments[0]
+        var currentClass: Class<*>? = subclass
+        while (currentClass != null && currentClass != Any::class.java) {
+            currentClass.genericSuperclass?.let { genericSuperclass ->
+                if (genericSuperclass is ParameterizedType) {
+                    val typeArguments = genericSuperclass.actualTypeArguments
+                    if (typeArguments.isNotEmpty()) {
+                        return typeArguments[0]
+                    }
+                }
+            }
+
+            for (genericInterface in currentClass.genericInterfaces) {
+                if (genericInterface is ParameterizedType) {
+                    val typeArguments = genericInterface.actualTypeArguments
+                    if (typeArguments.isNotEmpty()) {
+                        return typeArguments[0]
+                    }
+                }
+            }
+
+            currentClass = currentClass.genericSuperclass as? Class<*>
         }
+        return subclass
     }
 
-
     /**
-     * 获取泛型 Type
-     *
-     * @param subclass
-     * @param <T>
-     * @return
-    </T> */
+     * 兼容历史调用方，返回泛型 Type。
+     */
     fun <T> getGenericType(subclass: Class<*>): Type {
-        val types: Array<Type> = subclass.javaClass.genericInterfaces
-        val params = (types[0] as ParameterizedType).actualTypeArguments
-        return params[0]
+        return getType(subclass)
     }
 }
