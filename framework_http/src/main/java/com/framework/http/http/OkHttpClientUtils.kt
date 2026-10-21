@@ -1,6 +1,6 @@
 package com.framework.http.http
 
-import com.framework.http.BuildConfig
+
 import com.framework.http.utils.HttpConstants
 import com.framework.http.utils.SSLUtils
 import okhttp3.OkHttpClient
@@ -18,11 +18,7 @@ import javax.net.ssl.SSLSession
 object OkHttpClientUtils {
 
     fun getOkHttpClientBuild(): OkHttpClient {
-        val loggingLevel = if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BODY
-        } else {
-            HttpLoggingInterceptor.Level.NONE
-        }
+        val loggingLevel = HttpLoggingInterceptor.Level.BODY
 
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
             level = loggingLevel

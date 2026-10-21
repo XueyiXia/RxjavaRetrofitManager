@@ -1,21 +1,21 @@
 [versions]
-compileSdk = "35"
-minSdk = "25"
-targetSdk = "35"
-buildToolsVersion = "35.0.0"
+compileSdk = "36"
+minSdk = "26"
+targetSdk = "36"
+buildToolsVersion = "36.0.0"
 
 
-org-jetbrains-kotlin-android = "2.0.21"
-coreKtx = "1.15.0"
+org-jetbrains-kotlin-android = "2.4.21"
+coreKtx = "1.16.0"
 activityKtx = "1.10.1"
 fragmentKtx = "1.8.6"
 appcompat = "1.7.0"
 material = "1.12.0"
 constraintlayout = "2.2.1"
-lifecycle = "2.8.7"
+lifecycle = "2.9.4"
 recyclerview = "1.4.0"
-koinAndroidExt = "3.0.1"
-koin = "3.5.6"
+koinAndroidExt = "3.0.2"
+koin = "4.2.2"
 
 
 lifecycle-extensions="2.2.0"
@@ -37,9 +37,9 @@ unspecified = "1.1.0"
 androidComposeUi= "1.7.8"
 refresh-layout = "2.1.0"
 
-retrofit = "2.9.0"
-converter_gson = "2.9.0"
-adapter_rxjava3 = "2.9.0"
+retrofit = "3.0.0"
+converter_gson = "3.0.0"
+adapter_rxjava3 = "3.0.0"
 converter_scalars = "2.6.2"
 
 rxjava = "3.0.0"
