@@ -9,39 +9,28 @@ package com.framework.http.config
 
 class DownloadConfigure {
 
-    private object Config {
-        val downloadConfigure = DownloadConfigure()
-    }
-
     companion object {
-        fun get(): DownloadConfigure {
-            return Config.downloadConfigure
-        }
+        /**
+         * 保持兼容性，但不再复用全局单例状态，避免多任务并发时相互覆盖配置。
+         */
+        fun get(): DownloadConfigure = DownloadConfigure()
     }
 
     var directoryFile: String = ""
     var filename: String = ""
     var md5: String? = null
     var isBreakpoint = false
-    var urlLink:String=""
-
+    var urlLink: String = ""
 
     /**
      *
      * @param directoryFile String
      * @return DownloadConfigure
      */
-
     fun setDirectoryFile(directoryFile: String): DownloadConfigure {
         this.directoryFile = directoryFile
         return this
     }
-
-    /**
-     *
-     * @return String
-     */
-//    fun getDirectoryFile()=this.directoryFile
 
     /**
      *
@@ -53,7 +42,6 @@ class DownloadConfigure {
         return this
     }
 
-
     /**
      *
      * @param urlLink String
@@ -63,13 +51,6 @@ class DownloadConfigure {
         this.urlLink = urlLink
         return this
     }
-
-    /**
-     *
-     * @return String
-     */
-//    fun getFileName()=this.filename
-
 
     /**
      * 是否断点下载
@@ -83,13 +64,6 @@ class DownloadConfigure {
 
     /**
      *
-     * @return Boolean
-     */
-//    fun getIsBreakpoint()=this.isBreakpoint
-
-
-    /**
-     *
      * @param md5 String?
      * @return DownloadConfigure
      */
@@ -97,10 +71,4 @@ class DownloadConfigure {
         this.md5 = md5
         return this
     }
-
-    /**
-     *
-     * @return String?
-     */
-//    fun getMd5()=md5
 }
