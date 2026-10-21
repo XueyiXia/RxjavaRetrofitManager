@@ -1,49 +1,30 @@
 package com.framework.http.scheduler
 
-
 /**
  * @author: xiaxueyi
  * @date: 2022-12-05
  * @time: 13:11
- * @说明:
+ * @说明: 调度器工厂入口，保留原有 API 兼容。
  */
 object SchedulerUtils {
 
-    /**
-     *
-     * @return IoMainScheduler<T>
-     */
     fun <T> ioToMainScheduler(): IoMainScheduler<T> {
         return IoMainScheduler()
     }
 
-    /**
-     *
-     * @return NewThreadMainScheduler<T>
-     */
-    fun <T> newThreadScheduler() : NewThreadMainScheduler<T> {
+    fun <T> newThreadScheduler(): NewThreadMainScheduler<T> {
         return NewThreadMainScheduler()
     }
 
-    /**
-     *
-     * @return SingleMainScheduler<T>
-     */
-    fun <T> singleMainScheduler() : SingleMainScheduler<T> {
+    fun <T> singleMainScheduler(): SingleMainScheduler<T> {
         return SingleMainScheduler()
     }
 
-    /**
-     *
-     * @return ComputationMainScheduler<T>
-     */
-    fun <T> computationScheduler() : ComputationMainScheduler<T> {
+    fun <T> computationScheduler(): ComputationMainScheduler<T> {
         return ComputationMainScheduler()
     }
 
-
-    fun <T> trampolineMainScheduler() : TrampolineMainScheduler<T> {
+    fun <T> trampolineMainScheduler(): TrampolineMainScheduler<T> {
         return TrampolineMainScheduler()
     }
-
 }
