@@ -4,11 +4,12 @@ plugins {
     id 'maven-publish'
     id 'kotlin-kapt'
 }
+
 group = 'com.github.XueyiXia'
 version = '1.0'
 
 android {
-    namespace 'com.framework.http'
+    namespace 'com.xueyixia.http'
     compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
@@ -25,36 +26,35 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation (libs.coreKtx)
-    implementation (libs.appcompat)
-    implementation (libs.recyclerview)
-    implementation (libs.material)
-    implementation (libs.constraintlayout)
+    implementation(libs.coreKtx)
+    implementation(libs.appcompat)
+    implementation(libs.recyclerview)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
 
+    implementation(libs.retrofit)
+    implementation(libs.converterGson)
+    implementation(libs.adapter.rxjava3)
+    implementation(libs.converter.scalars)
 
-    implementation (libs.retrofit)
-    implementation (libs.converterGson)
-    implementation (libs.adapter.rxjava3)
-    implementation (libs.converter.scalars)
+    implementation(libs.rxjava)
+    implementation(libs.rxAndroid)
+    implementation(libs.gson)
+    implementation(libs.rxLifecycle)
 
-
-    implementation (libs.rxjava)
-    implementation (libs.rxAndroid)
-    implementation (libs.gson)
-    implementation (libs.rxLifecycle)
-
-    //OKHttp3
-    implementation (libs.okhttp3)
-    implementation (libs.okio)
-    implementation (libs.logging.interceptor)
+    implementation(libs.okhttp3)
+    implementation(libs.okio)
+    implementation(libs.logging.interceptor)
 }
